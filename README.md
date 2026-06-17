@@ -32,15 +32,17 @@ BUILD  → Build better projects
 
 | Module | Project | Status | Stack |
 |---|---|:---:|:---:|
-| 1.A - Containerization | [Taxi Data Ingestion Pipeline](01-docker-terraform/docker/) | 💚 Done | <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white"> <img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white"><br><img src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white"> |
-| 1.B - Infrastructure as Code | [Containerized Data Platform Infrastructure](01-docker-terraform/terraform/) | 💚 Done | <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white"> <img src="https://img.shields.io/badge/Terraform-844FBA?logo=terraform&logoColor=white"><br><img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white"> |
-| 2 - Workflow Orchestration | — | 🟡 Progress | — |
-| 3 - Data Warehousing | — | ⬜ Upcoming | — |
-| 4 - Analytics Engineering | — | ⬜ Upcoming | — |
-| 5 - Data Platforms | — | ⬜ Upcoming | — |
-| 6 - Batch Processing | — | ⬜ Upcoming | — |
-| 7 - Streaming | — | ⬜ Upcoming | — |
-| Data Ingestion Workshop | — | ⬜ Upcoming | — |
+| 1.A - Containerization | [Taxi Data Ingestion Pipeline](01-docker-terraform/docker/) | 🟢 | <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white"> <img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white"><br><img src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white"> |
+| 1.B - Infrastructure as Code | [Containerized Data Platform Infrastructure](01-docker-terraform/terraform/) | 🟢 | <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white"> <img src="https://img.shields.io/badge/Terraform-844FBA?logo=terraform&logoColor=white"><br><img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white"> |
+| 2 - Workflow Orchestration | — | 🟡 | — |
+| 3 - Data Warehousing | — | ⚪️ | — |
+| 4 - Analytics Engineering | — | ⚪️ | — |
+| 5 - Data Platforms | — | ⚪️ | — |
+| 6 - Batch Processing | — | ⚪️ | — |
+| 7 - Streaming | — | ⚪️ | — |
+| Data Ingestion Workshop | — | ⚪️ | — |
+
+`Status = 🟢 Done | 🟡 Progress | ⚪️ Upcoming`
 
 ## Repository Structure
  
