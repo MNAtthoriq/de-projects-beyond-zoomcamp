@@ -77,6 +77,8 @@ uv sync --locked
 uv run 01-docker-terraform/docker/ingest_data.py
 ```
 
+> Every modules have their own README.md to tell about their usage setup.
+
 ## References
 
 - Data Engineering Zoomcamp: https://github.com/DataTalksClub/data-engineering-zoomcamp

@@ -38,6 +38,7 @@ What I improve from [original tutorial:](https://github.com/DataTalksClub/data-e
 ├── main.tf
 ├── outputs.tf
 ├── variables.tf
+├── .terraform.lock.hcl       ← for reproducibility
 ├── terraform.tfvars.example  ← copy into terraform.tfvars for variable input
 ├── modules/                  ← categorize by life-cycle for easier re-install
 │   ├── networks/             ← docker-network, rarely changes
