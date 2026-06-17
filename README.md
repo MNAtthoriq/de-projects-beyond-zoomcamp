@@ -70,7 +70,7 @@ This repo uses [uv](https://github.com/astral-sh/uv) for Python environment mana
  
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/data-engineering-zoomcamp.git
+git clone https://github.com/MNAtthoriq/de-projects-beyond-zoomcamp.git
 cd learn-data-engineering-zoomcamp
  
 # Install dependencies
