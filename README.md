@@ -31,8 +31,8 @@ PUSH    → Commit my own code to this repository
 | Module     | Topic                    | Status        |
 | ---------- | ------------------------ | ------------- |
 | Module 1.A | Containerization as Code | 💚 Completed   |
-| Module 1.B | Infrastructure as Code   | 🟡 In Progress |
-| Module 2   | Workflow Orchestration   | ⬜ Upcoming    |
+| Module 1.B | Infrastructure as Code   | 💚 Completed   |
+| Module 2   | Workflow Orchestration   | 🟡 In Progress |
 | Workshop   | Data Ingestion           | ⬜ Upcoming    |
 | Module 3   | Data Warehousing         | ⬜ Upcoming    |
 | Module 4   | Analytics Engineering    | ⬜ Upcoming    |
@@ -44,8 +44,8 @@ PUSH    → Commit my own code to this repository
  
 ```
 learn-data-engineering-zoomcamp/
-├── 01-docker-terraform/        ← (in progress)
-├── 02-workflow-orchestration/  ← coming soon
+├── 01-docker-terraform/        ← completed
+├── 02-workflow-orchestration/  ← (in progress)
 ├── workshop-data-ingestion/    ← coming soon
 ├── 03-data-warehouse/          ← coming soon
 ├── 04-analytics-engineering/   ← coming soon
@@ -74,7 +74,7 @@ cd learn-data-engineering-zoomcamp
 uv sync --locked
  
 # Run any script
-uv run 01-docker-terraform/script.py
+uv run 01-docker-terraform/docker/ingest_data.py
 ```
 
 ## References

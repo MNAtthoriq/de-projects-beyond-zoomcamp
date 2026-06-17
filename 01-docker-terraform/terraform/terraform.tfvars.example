@@ -1,0 +1,10 @@
+# this is example
+# you need to copy it into terraform.tfvars and replace your values
+
+project_name = "learn-de-terraform"
+postgres_user = "root"
+postgres_password = "root"
+postgres_db = "learn-de-terraform-postgres-db"
+pgadmin_user = "admin@admin.com"
+pgadmin_password = "root"
+pgadmin_port = 8010

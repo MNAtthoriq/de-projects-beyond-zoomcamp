@@ -11,7 +11,7 @@
 Ingest multiple NY Taxi datasets (yellow taxi, green taxi, and zones) into a PostgreSQL database that can accessed using PgAdmin. The process is containerized using Docker.
 
 What I improve from [original tutorial:](https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/01-docker-terraform/docker-sql)
-|                  original code                  |                                my code                                |
+|                  Original                  |                                My Version                                |
 | :---------------------------------------------: | :-------------------------------------------------------------------: |
 | `docker-compose` only runs postgres and pgadmin |         Entire pipeline runs in a single `docker compose up`          |
 |       Re-running overwrites data silently       |    Safe re-runs by default, opt-in overwrite via `--force_replace`    |
@@ -21,22 +21,16 @@ What I improve from [original tutorial:](https://github.com/DataTalksClub/data-e
 
 ## Key Learnings
 
-1. Path resolution depends on where the reference is made, not where the command is run. `context:` block in `docker-compose.yaml` resolves relative to the compose file, while  `docker build -t name:tag build_context` for `Dockerfile` resolves relative to the terminal's current directory.
-2. Use `envvar=` in `@click.option()` so the script can be configured via environment variables, making it compatible with Docker Compose `environment:` block when using `docker compose up` (since it can't use CLI option).
-3. `pd.read_csv()` silently ignores extra keys in `dtype` that don't match any column, but `parse_dates` raises a ValueError for missing columns. Always validate columns exist before passing to `parse_dates`.
-
-## Key Learnings
-
 |        Concept         | What I Learned                                                                                                                                                                                                                                             |
 | :--------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 |    Path resolution     | Path resolution follows the caller, not the runner. Example: `context:` block in `docker-compose.yaml` resolves from the compose file's location, while `docker build -t name:tag build_context` for `Dockerfile` resolves from wherever your terminal is. |
 | Click + Docker Compose | `docker compose up` can't pass CLI flags hence use `envvar=` in `@click.option()` so your script reads from environment variables instead, making it fully compatible with Compose's `environment:` block.                                                 |
-|     Inconsistent Pandas     | Pandas is inconsistent with missing columns. `dtype` silently ignores keys that don't match, but `parse_dates` raises a ValueError. Always validate columns exist before passing to `parse_dates`.                                                         |
+|  Inconsistent Pandas   | Pandas is inconsistent with missing columns. `dtype` silently ignores keys that don't match, but `parse_dates` raises a ValueError. Always validate columns exist before passing to `parse_dates`.                                                         |
 
 ## Structure
 
 ```
-docker/
+01-docker-terraform/docker/
 ├── ingest_data.py      ← ingestion script
 ├── Dockerfile          ← containerizes the ingestion script
 ├── docker-compose.yml  ← orchestrates postgres, pgadmin, ingestion script
@@ -70,9 +64,9 @@ Open http://localhost:8085 in your browser.
 
 | Field    | Value   |
 | -------- | ------- |
+| Database | ny_taxi |
 | Host     | pgdb    |
 | Port     | 5432    |
-| Database | ny_taxi |
 | Username | root    |
 | Password | root    |
 
