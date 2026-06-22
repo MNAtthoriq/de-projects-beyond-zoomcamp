@@ -1,0 +1,56 @@
+id: 00_environment_setup
+namespace: zoomcamp
+description: |
+  This flow is for setup KV in Kestra. It only run ONCE per environment/machine,
+  right after `terraform apply`.
+
+  You can run it by triger using ./scripts/bootstrap_env.sh to automatically
+  push `terraform output` into Kestra or you can fill inputs manually from your
+  `terraform output` values into this flow using Kestra UI (click Execute on this flow).
+
+inputs:
+  - id: gcp_project_id
+    type: STRING
+    displayName: GCP Project ID
+    description: "From: terraform output project_id"
+
+  - id: gcp_region
+    type: STRING
+    displayName: GCP Region
+    description: "From: terraform output region"
+    defaults: us-central1
+
+  - id: gcp_bucket_name
+    type: STRING
+    displayName: GCS bucket name
+    description: "From: terraform output bucket_name"
+
+  - id: gcp_dataset
+    type: STRING
+    displayName: BigQuery dataset
+    description: "From: terraform output dataset_id"
+
+tasks:
+  - id: set_gcp_project_id
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_PROJECT_ID
+    kvType: STRING
+    value: "{{ inputs.gcp_project_id }}"
+
+  - id: set_gcp_location
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_LOCATION
+    kvType: STRING
+    value: "{{ inputs.gcp_region }}"
+
+  - id: set_gcp_bucket_name
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_BUCKET_NAME
+    kvType: STRING
+    value: "{{ inputs.gcp_bucket_name }}"
+
+  - id: set_gcp_dataset
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_DATASET
+    kvType: STRING
+    value: "{{ inputs.gcp_dataset }}"

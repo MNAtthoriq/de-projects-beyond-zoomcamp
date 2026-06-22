@@ -1,3 +1,6 @@
+# sandbox
+test-code-in-tutorial/
+
 # terraform
 **/.terraform/*
 **/*.tfstate
@@ -156,6 +159,8 @@ activemq-data/
 
 # Environments
 .env
+.env.secrets
+.env_encoded
 .envrc
 .venv
 env/
