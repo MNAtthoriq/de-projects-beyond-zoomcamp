@@ -1,0 +1,65 @@
+id: 01_taxi_tripdata_pipeline
+namespace: zoomcamp
+description: |
+  Pulls live monthly parquet release from TLC's official CDN into
+  BigQuery Database with automatic retry and quality data check.
+
+concurrency:
+  limit: 1
+
+inputs:
+  - id: taxi
+    type: SELECT
+    displayName: Select taxi type
+    values: [yellow, green]
+    defaults: yellow
+
+variables:
+  file: "{{ inputs.taxi }}_tripdata_{{ (trigger.date ?? now()) | dateAdd(-2, 'MONTHS') | date('yyyy-MM') }}.parquet"
+  gcs_file: "gs://{{ kv('GCP_BUCKET_NAME') }}/{{ vars.file }}"
+  ext_table: "{{ kv('GCP_DATASET') }}.{{ inputs.taxi }}_tripdata_ext"
+  tmp_table: "{{ kv('GCP_DATASET') }}.{{ inputs.taxi }}_tripdata_tmp"
+  main_table: "{{ kv('GCP_DATASET') }}.{{ inputs.taxi }}_tripdata"
+  data: "{{ outputs.extract.outputFiles[render(vars.file)] }}"
+
+tasks:
+  - id: set_label
+    type: io.kestra.plugin.core.execution.Labels
+    labels:
+      taxi: "{{ inputs.taxi }}"
+      file: "{{ render(vars.file) }}"
+
+  - id: extract
+    type: io.kestra.plugin.scripts.shell.Commands
+    outputFiles:
+      - "*.parquet"
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    commands:
+      - wget -q "https://d37ci6vzurychx.cloudfront.net/trip-data/{{ render(vars.file) }}" -O "{{ render(vars.file) }}"
+    retry:
+      type: constant
+      interval: PT30S
+      maxAttempt: 5
+      maxDuration: PT10M
+  
+  - id: upload_to_gcs
+    type: io.kestra.plugin.gcp.gcs.Upload
+    from: "{{ render(vars.data) }}"
+    to: "{{ render(vars.gcs_file) }}"
+    retry:
+      type: constant
+      interval: PT15S
+      maxAttempt: 3
+
+  - id: purge_files
+    type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
+    description: Remove downloaded files from Kestra's internal storage so it doesn't accumulate.
+
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{ secret('GCP_CREDS') }}"
+      projectId: "{{ kv('GCP_PROJECT_ID') }}"
+      location: "{{ kv('GCP_LOCATION') }}"
+      bucket: "{{ kv('GCP_BUCKET_NAME') }}"
