@@ -17,9 +17,9 @@ inputs:
 variables:
   file: "{{ inputs.taxi }}_tripdata_{{ (trigger.date ?? now()) | dateAdd(-2, 'MONTHS') | date('yyyy-MM') }}.parquet"
   gcs_file: "gs://{{ kv('GCP_BUCKET_NAME') }}/{{ vars.file }}"
-  ext_table: "{{ kv('GCP_DATASET') }}.{{ inputs.taxi }}_tripdata_ext"
-  tmp_table: "{{ kv('GCP_DATASET') }}.{{ inputs.taxi }}_tripdata_tmp"
-  main_table: "{{ kv('GCP_DATASET') }}.{{ inputs.taxi }}_tripdata"
+  ext_table: "{{ kv('GCP_PROJECT_ID') }}.{{ kv('GCP_DATASET') }}.{{ inputs.taxi }}_tripdata_ext"
+  tmp_table: "{{ kv('GCP_PROJECT_ID') }}.{{ kv('GCP_DATASET') }}.{{ inputs.taxi }}_tripdata_tmp"
+  main_table: "{{ kv('GCP_PROJECT_ID') }}.{{ kv('GCP_DATASET') }}.{{ inputs.taxi }}_tripdata"
   data: "{{ outputs.extract.outputFiles[render(vars.file)] }}"
 
 tasks:
@@ -52,6 +52,158 @@ tasks:
       interval: PT15S
       maxAttempt: 3
 
+  - id: if_yellow_taxi
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{ inputs.taxi == 'yellow' }}"
+    then:
+      - id: yellow_ext_table
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Create external table by reading schema from .parquet
+        sql: |
+          CREATE OR REPLACE EXTERNAL TABLE `{{ render(vars.ext_table) }}`
+          OPTIONS (format = 'PARQUET', uris = ['{{ render(vars.gcs_file) }}']);
+      
+      - id: yellow_tmp_table
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Create temporary table from external table with unique_row_id and filename column
+        sql: |
+          CREATE OR REPLACE TABLE `{{ render(vars.tmp_table) }}` AS
+          SELECT
+            TO_HEX(MD5(CONCAT(
+              COALESCE(CAST(VendorID AS STRING), ''),
+              COALESCE(CAST(tpep_pickup_datetime AS STRING), ''),
+              COALESCE(CAST(tpep_dropoff_datetime AS STRING), ''),
+              COALESCE(CAST(PULocationID AS STRING), ''),
+              COALESCE(CAST(DOLocationID AS STRING), ''),
+              COALESCE(CAST(total_amount AS STRING), ''),
+              COALESCE(CAST(trip_distance AS STRING), ''),
+              COALESCE(CAST(passenger_count AS STRING), '')
+            ))) AS unique_row_id,
+            '{{ render(vars.file) }}' AS filename,
+            *
+          FROM `{{ render(vars.ext_table) }}`;
+      
+      - id: yellow_quality_table
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Raises SQL error if tmp_table have zero row or duplicated unique_row_id
+        sql: |
+          SELECT IF(
+            COUNT(*) = 0,
+            ERROR(CONCAT('Quality gate failed: ', '{{ render(vars.file) }}', ' loaded 0 rows')),
+            IF(
+              COUNT(*) > COUNT(DISTINCT unique_row_id),
+              ERROR(CONCAT('Quality gate failed: ', '{{ render(vars.file) }}', ' has duplicated unique_row_id')),
+              COUNT(*)
+            )
+          ) AS row_count
+          FROM `{{ render(vars.tmp_table) }}`;
+      
+      - id: yellow_main_table_init
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Only create table + partitioning once
+        sql: |
+          CREATE TABLE IF NOT EXISTS `{{ render(vars.main_table) }}`
+          PARTITION BY DATE(tpep_pickup_datetime) AS
+          SELECT * FROM `{{ render(vars.tmp_table) }}` WHERE FALSE;
+      
+      - id: yellow_main_table_evolve
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: After 2025, there is new column that need to be added
+        sql: |
+          ALTER TABLE `{{ render(vars.main_table) }}`
+          ADD COLUMN IF NOT EXISTS cbd_congestion_fee NUMERIC;
+
+      - id: yellow_merge
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Update with value from temporary table that not in main table yet
+        sql: |
+          MERGE INTO `{{ render(vars.main_table) }}` T
+          USING `{{ render(vars.tmp_table) }}` S
+          ON T.unique_row_id = S.unique_row_id
+          WHEN NOT MATCHED THEN INSERT ROW;
+      
+      - id: yellow_cleanup
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Drop external and temporary table after using
+        sql: |
+          DROP EXTERNAL TABLE IF EXISTS `{{ render(vars.ext_table) }}`;
+          DROP TABLE IF EXISTS `{{ render(vars.tmp_table) }}`;
+
+  - id: if_green_taxi
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{ inputs.taxi == 'green' }}"
+    then:
+      - id: green_ext_table
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Create external table by reading schema from .parquet
+        sql: |
+          CREATE OR REPLACE EXTERNAL TABLE `{{ render(vars.ext_table) }}`
+          OPTIONS (format = 'PARQUET', uris = ['{{ render(vars.gcs_file) }}']);
+      
+      - id: green_tmp_table
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Create temporary table from external table with unique_row_id and filename column
+        sql: |
+          CREATE OR REPLACE TABLE `{{ render(vars.tmp_table) }}` AS
+          SELECT
+            TO_HEX(MD5(CONCAT(
+              COALESCE(CAST(VendorID AS STRING), ''),
+              COALESCE(CAST(lpep_pickup_datetime AS STRING), ''),
+              COALESCE(CAST(lpep_dropoff_datetime AS STRING), ''),
+              COALESCE(CAST(PULocationID AS STRING), ''),
+              COALESCE(CAST(DOLocationID AS STRING), ''),
+              COALESCE(CAST(total_amount AS STRING), '')
+            ))) AS unique_row_id,
+            '{{ render(vars.file) }}' AS filename,
+            *
+          FROM `{{ render(vars.ext_table) }}`;
+      
+      - id: green_quality_table
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Raises SQL error if tmp_table have zero row or duplicated unique_row_id
+        sql: |
+          SELECT IF(
+            COUNT(*) = 0,
+            ERROR(CONCAT('Quality gate failed: ', '{{ render(vars.file) }}', ' loaded 0 rows')),
+            IF(
+              COUNT(*) > COUNT(DISTINCT unique_row_id),
+              ERROR(CONCAT('Quality gate failed: ', '{{ render(vars.file) }}', ' has duplicated unique_row_id')),
+              COUNT(*)
+            )
+          ) AS row_count
+          FROM `{{ render(vars.tmp_table) }}`;
+      
+      - id: green_main_table_init
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Only create table + partitioning once
+        sql: |
+          CREATE TABLE IF NOT EXISTS `{{ render(vars.main_table) }}`
+          PARTITION BY DATE(lpep_pickup_datetime) AS
+          SELECT * FROM `{{ render(vars.tmp_table) }}` WHERE FALSE;
+      
+      - id: green_main_table_evolve
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: After 2025, there is new column that need to be added
+        sql: |
+          ALTER TABLE `{{ render(vars.main_table) }}`
+          ADD COLUMN IF NOT EXISTS cbd_congestion_fee NUMERIC;
+
+      - id: green_merge
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Update with value from temporary table that not in main table yet
+        sql: |
+          MERGE INTO `{{ render(vars.main_table) }}` T
+          USING `{{ render(vars.tmp_table) }}` S
+          ON T.unique_row_id = S.unique_row_id
+          WHEN NOT MATCHED THEN INSERT ROW;
+      
+      - id: green_cleanup
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Drop external and temporary table after using
+        sql: |
+          DROP EXTERNAL TABLE IF EXISTS `{{ render(vars.ext_table) }}`;
+          DROP TABLE IF EXISTS `{{ render(vars.tmp_table) }}`;
+
   - id: purge_files
     type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
     description: Remove downloaded files from Kestra's internal storage so it doesn't accumulate.
@@ -63,3 +215,16 @@ pluginDefaults:
       projectId: "{{ kv('GCP_PROJECT_ID') }}"
       location: "{{ kv('GCP_LOCATION') }}"
       bucket: "{{ kv('GCP_BUCKET_NAME') }}"
+
+triggers:
+  - id: green_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 9 5 * *"
+    inputs:
+      taxi: green
+  
+  - id: yellow_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 10 5 * *"
+    inputs:
+      taxi: yellow
