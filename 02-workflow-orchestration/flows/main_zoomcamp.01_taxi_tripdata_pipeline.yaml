@@ -80,6 +80,7 @@ tasks:
               COALESCE(CAST(passenger_count AS STRING), '')
             ))) AS unique_row_id,
             '{{ render(vars.file) }}' AS filename,
+            CURRENT_TIMESTAMP() AS loaded_at,
             *
           FROM `{{ render(vars.ext_table) }}`;
       
@@ -155,6 +156,7 @@ tasks:
               COALESCE(CAST(total_amount AS STRING), '')
             ))) AS unique_row_id,
             '{{ render(vars.file) }}' AS filename,
+            CURRENT_TIMESTAMP() AS loaded_at,
             *
           FROM `{{ render(vars.ext_table) }}`;
       
