@@ -148,6 +148,12 @@ cd terraform && terraform destroy   # remove GCS bucket, BigQuery dataset, servi
 | `service_account_id` | `terraform.tfvars` | ID of the service account created for Kestra | No |
 | `raw_data_retention_days` | `terraform.tfvars` | Number of days to retain raw data in the GCS bucket before automatic deletion | No |
 
+## Author
+
+**Muhammad Naufal At-Thoriq**
+- GitHub: [MNAtthoriq](https://github.com/MNAtthoriq)
+- LinkedIn: [Muhammad Naufal At-Thoriq](https://linkedin.com/in/mnatthoriq)
+
 ## Reference
 
 - [DE Projects - Beyond Zoomcamp](../)
