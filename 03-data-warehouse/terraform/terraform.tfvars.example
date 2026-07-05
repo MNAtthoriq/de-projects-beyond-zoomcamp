@@ -1,0 +1,7 @@
+# copy this into terraform.tfvars then change variable to your desired input
+
+project_id  = "your-project-id"
+region      = "asia-southeast1"
+bucket_name = "gcs-bucket_name" 
+dataset_id  = "dataset"
+raw_data_retention_days = 7
