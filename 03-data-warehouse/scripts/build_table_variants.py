@@ -1,5 +1,7 @@
+"""
+Build table variants for different time windows and cluster zones
+"""
 import csv
-import os
 from google.cloud import bigquery
 from utils.common import (
     BUCKET, STAGING_TABLE, client,
@@ -9,6 +11,7 @@ from utils.common import (
 from pathlib import Path
 
 def load_staging_table():
+    """Load raw parquet files from GCS into the staging table in BigQuery"""
     print(f"Loading raw parquet -> {STAGING_TABLE}")
     job_config = bigquery.LoadJobConfig(
         source_format=bigquery.SourceFormat.PARQUET,
@@ -24,6 +27,7 @@ def load_staging_table():
     print(f"  loaded {table.num_rows:,} rows, {table.num_bytes / 1e9:.2f} GB")
 
 def variant_ddl(fqn: str, variant: str, where_clause: str) -> str:
+    """Generate DDL for creating a table variant based on the staging table"""
     select = f"SELECT * FROM `{STAGING_TABLE}` WHERE {where_clause}"
     target = f"`{fqn}`"
 
@@ -38,10 +42,11 @@ def variant_ddl(fqn: str, variant: str, where_clause: str) -> str:
     raise ValueError(variant)
 
 def build_tiers():
+    """Build table variants for each tier and variant, returning a manifest of created tables"""
     data_min, data_max = staging_month_bounds()
     print(f"Data spans from {data_min} to {data_max}")
 
-    manifest = []
+    manifest = [] # manifest for sanity check of created tables
     for tier in TIERS:
         bounds = tier_bounds(tier, data_min, data_max)
         if bounds is None:
@@ -82,7 +87,7 @@ if __name__ == "__main__":
     results_dir = (Path(__file__).resolve().parent / ".." / "results").resolve()
     results_dir.mkdir(exist_ok=True)
 
-    if manifest:
+    if manifest: # manifest for sanity check
         manifest_file = results_dir / "table_manifest.csv"
 
         with manifest_file.open("w", newline="") as f:

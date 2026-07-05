@@ -41,9 +41,10 @@ DTYPES = {
 COMMON_COLUMNS = ["pickup_datetime", "dropoff_datetime", *DTYPES.keys()]
 
 def month_list(n_months: int, lag_months: int = 2) -> list[tuple[int, int]]:
+    """Get a list of (year, month) tuples for the last n_months, lagging by lag_months"""
     today = date.today()
     y, m = today.year, today.month
-    for _ in range(lag_months):
+    for _ in range(lag_months): # lag_months is 2 because NYC TLC publishes latest data with a 2-month lag
         m -= 1
         if m == 0:
             m, y = 12, y-1
@@ -57,6 +58,7 @@ def month_list(n_months: int, lag_months: int = 2) -> list[tuple[int, int]]:
     return list(reversed(months))
 
 def download_with_progress(url: str, local_path: str, desc: str) -> bool:
+    """Download a file from a URL with a progress bar, returning True if successful, False if 404, error for other issues"""
     with requests.get(url, stream=True) as r:
         if r.status_code == 404:
             print(f"  not published yet, skipping: {url}")
@@ -74,6 +76,7 @@ def download_with_progress(url: str, local_path: str, desc: str) -> bool:
     return True
 
 def standardize(local_parquet: str, service: str, year: int, month: int) -> str:
+    """Standardize the schema of a raw parquet file, returning the path to the standardized parquet file"""
     df = pd.read_parquet(local_parquet)
 
     pickup_col = "tpep_pickup_datetime" if service == "yellow" else "lpep_pickup_datetime"
@@ -94,6 +97,7 @@ def standardize(local_parquet: str, service: str, year: int, month: int) -> str:
     return out_path
 
 def upload_to_gcs_with_progress(bucket: str, object_name: str, local_file: str):
+    """Upload a local file to GCS with a progress bar, skipping if already exists"""
     # tune chunk size for slow uploads
     storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024
     storage.blob._DEFAULT_CHUNKSIZE = 5 * 1024 * 1024
@@ -115,6 +119,7 @@ def upload_to_gcs_with_progress(bucket: str, object_name: str, local_file: str):
     print(f"  uploaded: gs://{bucket}/{object_name}")
 
 def main():
+    """Ingest NYC TLC tripdata from the TLC CDN into GCS"""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument(
         "--months", type=int, default=12,
@@ -153,7 +158,7 @@ def main():
                 std_path = standardize(file_name, service, year, month)
                 upload_to_gcs_with_progress(args.bucket, object_name, std_path)
 
-            finally:
+            finally: # cleanup local files
                 if os.path.exists(file_name):
                     os.remove(file_name)
 
