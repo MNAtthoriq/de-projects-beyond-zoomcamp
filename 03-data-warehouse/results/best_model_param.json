@@ -1,0 +1,43 @@
+{
+  "winner_model": "XGBRegressor",
+  "metrics": {
+    "r2_train": 0.99988,
+    "r2_test": 0.99977,
+    "r2_gap_pct": 0.01105,
+    "mae_train_mb": 1.46074,
+    "mae_test_mb": 1.96837,
+    "mae_gap_pct": 34.75117,
+    "fit": "good fit"
+  },
+  "hyperparameters": {
+    "MODEL_TYPE": "BOOSTED_TREE_REGRESSOR",
+    "BOOSTER_TYPE": "GBTREE",
+    "TREE_METHOD": "AUTO",
+    "MAX_TREE_DEPTH": 6,
+    "LEARN_RATE": 0.300000012,
+    "MIN_TREE_CHILD_WEIGHT": 1,
+    "SUBSAMPLE": 1.0,
+    "COLSAMPLE_BYTREE": 1.0,
+    "COLSAMPLE_BYLEVEL": 1.0,
+    "COLSAMPLE_BYNODE": 1.0,
+    "L1_REG": 0.0,
+    "L2_REG": 1.0,
+    "MIN_SPLIT_LOSS": 0.0,
+    "MAX_ITERATIONS": 100,
+    "NUM_PARALLEL_TREE": 1,
+    "DATA_SPLIT_METHOD": "RANDOM",
+    "DATA_SPLIT_EVAL_FRACTION": 0.2,
+    "EARLY_STOP": "FALSE",
+    "INPUT_LABEL_COLS": "['bytes_processed']",
+    "ENABLE_GLOBAL_EXPLAIN": "TRUE"
+  },
+  "features": [
+    "has_partition",
+    "has_cluster",
+    "table_size_bytes",
+    "partition_filter_ratio",
+    "cluster_filter_ratio"
+  ],
+  "target": "bytes_processed",
+  "notes": "No log1p transformation is required for the target variable (unlike Linear Regression, this model can use raw bytes target)"
+}

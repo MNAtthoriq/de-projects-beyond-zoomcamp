@@ -1,0 +1,15 @@
+{
+	"framework" : "custom_container",
+	"inputs" : 
+	{
+		"cluster_filter_ratio" : {},
+		"has_cluster" : {},
+		"has_partition" : {},
+		"partition_filter_ratio" : {},
+		"table_size_bytes" : {}
+	},
+	"outputs" : 
+	{
+		"predictions" : {}
+	}
+}

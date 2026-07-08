@@ -1,0 +1,50 @@
+{
+	"feature_names" : 
+	[
+		"has_partition",
+		"has_cluster",
+		"table_size_bytes",
+		"partition_filter_ratio",
+		"cluster_filter_ratio"
+	],
+	"features" : 
+	{
+		"cluster_filter_ratio" : 
+		{
+			"max" : 0.0475720659798395,
+			"mean" : 0.008848289309072907,
+			"min" : 0,
+			"stddev" : 0.01548160486595195
+		},
+		"has_cluster" : 
+		{
+			"max" : 1,
+			"mean" : 0.4999999999999981,
+			"min" : 0,
+			"stddev" : 0.5000624492602194
+		},
+		"has_partition" : 
+		{
+			"max" : 1,
+			"mean" : 0.4999999999999991,
+			"min" : 0,
+			"stddev" : 0.50006244926022
+		},
+		"partition_filter_ratio" : 
+		{
+			"max" : 1,
+			"mean" : 0.288683605270471,
+			"min" : 0.002770083102493,
+			"stddev" : 0.2618332325357746
+		},
+		"table_size_bytes" : 
+		{
+			"max" : 7234806562,
+			"mean" : 5142549622.020975,
+			"min" : 1201852092,
+			"stddev" : 1806584805.416793
+		}
+	},
+	"label_col" : "bytes_processed",
+	"model_type" : "boosted_tree_regressor"
+}
