@@ -176,10 +176,10 @@ raw_df = core.predict_bytes(booster, table_size_bytes, partition_ratio, cluster_
 result_df = core.add_cost_and_saving(raw_df, price_per_tib_display)
 best_row = result_df.iloc[-1]
  
-if best_row["strategy"] != "No optimization" and best_row["savings_pct"] > 1:
+if best_row["strategy"] != "No optimization" and best_row["saving_pct"] > 1:
     st.success(
         f"### Yes! **{best_row['strategy']}** cuts data scanned by **{best_row['saving_pct']:.1f}%**, "
-        f"saving {core.format_money(best_row['savings_abs'], display_currency)} per query."
+        f"saving {core.format_money(best_row['saving_abs'], display_currency)} per query."
     )
 else:
     st.info("For this parameter combination, optimization barely moves the needle. The baseline is already close to optimal.")
