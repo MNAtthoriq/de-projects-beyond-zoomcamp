@@ -70,7 +70,7 @@ def predict_bytes(booster, table_size_bytes: float, partition_ratio: float, clus
             "cluster_filter_ratio": cluster_ratio
         }
         row = build_row(booster, values)
-        pred = float(booster.predict(xgb.DMatrix(row)[0]))
+        pred = float(booster.predict(xgb.DMatrix(row))[0])
         pred = min(max(pred, 0.0), table_size_bytes) # bounds for table_size
         rows.append({
             "strategy": name, "has_partition": has_part, 
