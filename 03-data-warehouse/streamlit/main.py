@@ -193,11 +193,9 @@ table_view["saving_abs"] = table_view["saving_abs"].apply(lambda a: core.format_
 table_view.columns = ["Strategy", "Data Scanned", "Cost / Query", "Saving vs Baseline", "Saved / Query"]
 st.dataframe(table_view, hide_index=True, use_container_width=True)
 
-st.dataframe(pd.DataFrame({
-    "table_size_bytes": table_size_bytes,
-    "partition_filter_ratio": partition_ratio,
-    "cluster_filter_ratio": cluster_ratio,
-}))
+st.write(table_size_bytes)
+st.write(partition_ratio)
+st.write(cluster_ratio)
 
 
 
