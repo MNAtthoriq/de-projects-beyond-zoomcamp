@@ -178,14 +178,20 @@ best_row = result_df.iloc[-1]
  
 if best_row["strategy"] != "No optimization" and best_row["saving_pct"] > 1:
     st.success(
-        f"Yes! **\"{best_row['strategy']}\"** strategy cuts data scanned by **{best_row['saving_pct']:.1f}%**, "
+        f"**\"{best_row['strategy']}\"** is the best strategy that cuts data scanned by **{best_row['saving_pct']:.2f}%**, "
         f"saving {core.format_money(best_row['saving_abs'], display_currency)} per query."
     )
 else:
     st.info("For this parameter combination, optimization barely moves the needle. The baseline is already close to optimal.")
-st.caption("Assumes a query matching the benchmarked shape above (see *Model scope*).")
 
-
+st.subheader("1. Cost & data scanned by strategy")
+table_view = result_df[["strategy", "predicted_bytes", "cost", "saving_pct", "saving_abs"]].copy()
+table_view["predicted_bytes"] = table_view["predicted_bytes"].apply(core.format_bytes)
+table_view["cost"] = table_view["cost"].apply(lambda c: core.format_money(c, display_currency))
+table_view["saving_pct"] = table_view["saving_pct"].apply(lambda p: f"{p:.1f}%")
+table_view["saving_abs"] = table_view["saving_abs"].apply(lambda a: core.format_money(a, display_currency))
+table_view.columns = ["Strategy", "Data Scanned", "Cost / Query", "Saving vs Baseline", "Saved / Query"]
+st.dataframe(table_view, hide_index=True, use_container_width=True)
 
 
 
