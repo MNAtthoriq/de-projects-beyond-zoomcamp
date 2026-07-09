@@ -34,7 +34,7 @@ def fetch_usd_idr_rate():
 st.set_page_config(
     page_title="Is Partition & Cluster Worth It?",
     page_icon="😮", layout="wide",
-    initial_sidebar_state=450
+    initial_sidebar_state=350
 )
 
 st.markdown(
