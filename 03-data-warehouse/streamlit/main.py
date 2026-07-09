@@ -178,7 +178,7 @@ best_row = result_df.iloc[-1]
  
 if best_row["strategy"] != "No optimization" and best_row["savings_pct"] > 1:
     st.success(
-        f"### Yes! **{best_row['strategy']}** cuts data scanned by **{best_row['savings_pct']:.1f}%**, "
+        f"### Yes! **{best_row['strategy']}** cuts data scanned by **{best_row['saving_pct']:.1f}%**, "
         f"saving {core.format_money(best_row['savings_abs'], display_currency)} per query."
     )
 else:
