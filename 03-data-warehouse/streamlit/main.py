@@ -126,9 +126,7 @@ with st.sidebar:
             st.caption(f" :red[⚠️ Maximum zone reached! \nYou cannot exceed {core.TOTAL_ZONES} zone.]")
             filter_zones = None
 
-        # calculate ratio
-        partition_ratio = filter_days / total_days
-        cluster_ratio = filter_zones / core.TOTAL_ZONES
+		# queries per day
         st.caption("How many queries per day?")
         queries_per_day = st.number_input(
             "Queries per day", 
@@ -168,3 +166,41 @@ with st.sidebar:
         if not conversion_ok:
             st.caption("⚠️ Live USD/IDR rate unavailable right now. Showing results in your input currency instead.")
             display_currency = input_currency
+
+# compute
+table_size_bytes = table_size_gb * core.BYTES_PER_GB
+partition_ratio = filter_days / total_days
+cluster_ratio = filter_zones / core.TOTAL_ZONES
+ 
+raw_df = core.predict_bytes(booster, table_size_bytes, partition_ratio, cluster_ratio)
+result_df = core.add_cost_and_savings(raw_df, price_per_tib_display)
+best_row = result_df.iloc[-1]
+ 
+if best_row["strategy"] != "No optimization" and best_row["savings_pct"] > 1:
+    st.success(
+        f"### Yes! **{best_row['strategy']}** cuts data scanned by **{best_row['savings_pct']:.1f}%**, "
+        f"saving {core.format_money(best_row['savings_abs'], display_currency)} per query."
+    )
+else:
+    st.info("For this parameter combination, optimization barely moves the needle. The baseline is already close to optimal.")
+st.caption("Assumes a query matching the benchmarked shape above (see *Model scope*).")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
