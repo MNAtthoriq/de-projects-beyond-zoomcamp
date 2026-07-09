@@ -173,7 +173,7 @@ partition_ratio = filter_days / total_days
 cluster_ratio = filter_zones / core.TOTAL_ZONES
  
 raw_df = core.predict_bytes(booster, table_size_bytes, partition_ratio, cluster_ratio)
-result_df = core.add_cost_and_savings(raw_df, price_per_tib_display)
+result_df = core.add_cost_and_saving(raw_df, price_per_tib_display)
 best_row = result_df.iloc[-1]
  
 if best_row["strategy"] != "No optimization" and best_row["savings_pct"] > 1:
