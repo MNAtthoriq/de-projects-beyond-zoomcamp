@@ -5,8 +5,11 @@ from datetime import datetime, timedelta
 from utils.common import PARTITION_COL, CLUSTER_COL
 
 # combination variable for partition column
-PARTITION_RATIO_TARGETS = [0.01, 0.02, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-OFFSET_RATIO_TARGETS = [0.0, 0.15, 0.35] 
+PARTITION_RATIO_TARGETS = [
+    0.005, 0.01, 0.02, 0.03, 0.05, 0.075, 0.1, 0.15, 0.2, 0.3,
+    0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0
+]
+OFFSET_RATIO_TARGETS = [0.0, 0.15, 0.3, 0.5]
 # combination variable for cluster column
 CLUSTER_RATIO_TARGETS = [0.01, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 1.0]
 
