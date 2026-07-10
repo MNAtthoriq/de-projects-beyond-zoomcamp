@@ -34,7 +34,7 @@ TRAIN_SIZE_DAYS_MIN, TRAIN_SIZE_DAYS_MAX = 60, 365 # outside this range are extr
 DEFAULT_PRICE_PER_TIB_USD = 6.25  # BigQuery on-demand pricing, as of this build
 BYTES_PER_TIB = 2**40
 BYTES_PER_GB = 2**30
-TOTAL_ZONES = 256 # there are official 256 taxi zones
+TOTAL_ZONES = 261 # there are official 261 taxi zones
 
 STRATEGIES = [ # partition, cluster
     ("No optimization", 0, 0),

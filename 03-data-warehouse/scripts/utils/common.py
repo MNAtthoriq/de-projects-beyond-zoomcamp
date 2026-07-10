@@ -17,7 +17,7 @@ BUCKET = os.environ["GCP_GCS_BUCKET"]
 STAGING_TABLE = f"{PROJECT}.{DATASET}.trips_staging"
 
 # table variables
-TIERS = [2, 4, 6, 8, 10, 12] # months
+TIERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] # months
 VARIANTS = ["none", "part", "clust", "partclust"]
 PARTITION_COL = "pickup_datetime"
 CLUSTER_COL = "PULocationID"
