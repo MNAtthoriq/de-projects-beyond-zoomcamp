@@ -10,24 +10,22 @@ import xgboost as xgb
 # config
 FEATURES = ["has_partition", "has_cluster", "table_size_bytes", "partition_filter_ratio", "cluster_filter_ratio"]
 FEATURE_IMPORTANCE = {
-    "has_cluster": 0.4096,
-    "has_partition": 0.2321,
-    "table_size_bytes": 0.1793,
-    "partition_filter_ratio": 0.1744,
-    "cluster_filter_ratio": 0.0046,
+    "has_cluster": 0.1738,
+    "has_partition": 0.3038,
+    "table_size_bytes": 0.2743,
+    "partition_filter_ratio": 0.1444,
+    "cluster_filter_ratio": 0.1038,
 } # write manual from feature_importance_bqml_model.sql query
 
 MODEL_METRICS = {
-    "r2_train": 0.9999,
-    "r2_test": 0.9997,
-    "r2_gap_pct": 0.0151,
-    "mae_train_mb": 1.1978,
-    "mae_test_mb": 2.0182,
-    "mae_gap_pct": 68.4858,
+    "r2_train": 0.9998,
+    "r2_test": 0.9998,
+    "r2_gap_pct": 0.0037,
+    "mae_train_mb": 1.4793,
+    "mae_test_mb": 1.5976,
+    "mae_gap_pct": 7.9963,
     "fit": "good fit",
 } # write manual from evaluate_bqml_model.sql query
-MODEL_R2 = MODEL_METRICS["r2_test"]
-MODEL_MAE_MB = MODEL_METRICS["mae_test_mb"]
 
 DEFAULT_PRICE_PER_TIB_USD = 6.25  # BigQuery on-demand pricing, as of this build
 BYTES_PER_TIB = 2**40
@@ -120,10 +118,10 @@ def resolve_display_price(
         return price_input / usd_idr_rate, True
     return price_input, True
 
-def format_money(amount: float, currency: str) -> str:
+def format_money(amount: float, currency: str, round: int = 4) -> str:
     if currency == "IDR":
         return f"Rp{amount:,.0f}"
-    return f"${amount:,.4f}"
+    return f"${amount:,.{round}f}"
 
 def format_bytes(n: float) -> str:
     if n >= 1e9:

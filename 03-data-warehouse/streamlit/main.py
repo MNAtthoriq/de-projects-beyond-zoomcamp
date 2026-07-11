@@ -54,7 +54,7 @@ st.title("Is Partitioning and Clustering Really Worth It?")
 st.caption(
     "See how partitioning and clustering affect your BigQuery query cost. "
     "Compare bytes scanned and cost across storage strategies before execution. " \
-    "Powered by BigQuery ML trained on 4,000+ real dry-run benchmarks across 12 months data."
+    "Powered by BigQuery ML trained on 24,000+ real dry-run benchmarks across 12 months data."
 )
 
 # load model, if there is no model yet, you may upload .bst file
@@ -85,7 +85,7 @@ with st.sidebar:
         st.caption("How many partition days your table filter?")
         filter_days = st.slider(
             "Filter days",
-            0.0, 100.0, 10.0, 5.0,
+            1.0, 100.0, 10.0, 3.0,
             "%.0f%%",
             label_visibility="collapsed"
         )
@@ -94,7 +94,7 @@ with st.sidebar:
         st.caption("How many cluster zones your table filter?")
         filter_zones = st.slider(
             "Filter zones",
-            0.0, 100.0, 10.0, 5.0,
+            1.0, 100.0, 10.0, 3.0,
             "%.0f%%",
             label_visibility="collapsed"
         )
@@ -103,11 +103,11 @@ with st.sidebar:
         st.caption("How many queries per day?")
         queries_per_day = st.number_input(
             "Queries per day", 
-            1, None, 100,
+            1, None, 10000,
             label_visibility="collapsed"
         )
         
-    with st.expander("**DESCRIBE YOUR CURRENCY**", expanded=True):
+    with st.expander("**DESCRIBE YOUR CURRENCY**", expanded=False):
         st.caption("Enter cost/TiB scanned in:")
         input_currency = st.radio(
             "Enter cost/TiB in:", ["USD", "IDR"], 
@@ -140,6 +140,18 @@ with st.sidebar:
             st.caption("⚠️ Live USD/IDR rate unavailable right now. Showing results in your input currency instead.")
             display_currency = input_currency
 
+    st.markdown(
+        f"""
+        <div style="text-align:center; font-size:1em; color:{TEXT_MUTED}; line-height:1.6;">
+            Built by <b style="color:{TEXT_PRIMARY};">MN Atthoriq</b><br>
+            <a href="https://www.linkedin.com/in/mnatthoriq/" target="_blank" style="color:{ACCENT_INDIGO}; text-decoration:none;">LinkedIn</a>
+            &nbsp;·&nbsp;
+            <a href="https://github.com/MNAtthoriq/de-projects-beyond-zoomcamp/tree/main/03-data-warehouse" target="_blank" style="color:{ACCENT_INDIGO}; text-decoration:none;">GitHub</a>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 # compute
 table_size_bytes = table_size_gb * core.BYTES_PER_GB
 partition_ratio = filter_days / 100
@@ -157,16 +169,106 @@ if best_row["strategy"] != "No optimization" and best_row["saving_pct"] > 1:
 else:
     st.info("For this parameter combination, optimization barely moves the needle. The baseline is already close to optimal.")
 
-st.subheader("1. Cost & data scanned by strategy")
+per_query = best_row["saving_abs"]
+c1, c2, c3 = st.columns(3)
+c1.metric("Saving per day", core.format_money(per_query * queries_per_day, display_currency, 0))
+c2.metric("Saving per month", core.format_money(per_query * queries_per_day * 30, display_currency, 0))
+c3.metric("Saving per year", core.format_money(per_query * queries_per_day * 365, display_currency, 0))
+
+st.subheader("Strategy Breakdown")
 table_view = result_df[["strategy", "predicted_bytes", "cost", "saving_pct", "saving_abs"]].copy()
 table_view["predicted_bytes"] = table_view["predicted_bytes"].apply(core.format_bytes)
 table_view["cost"] = table_view["cost"].apply(lambda c: core.format_money(c, display_currency))
 table_view["saving_pct"] = table_view["saving_pct"].apply(lambda p: f"{p:.1f}%")
 table_view["saving_abs"] = table_view["saving_abs"].apply(lambda a: core.format_money(a, display_currency))
-table_view.columns = ["Strategy", "Data Scanned", "Cost / Query", "Saving vs Baseline", "Saved / Query"]
+table_view.columns = ["Strategy", "Data Scanned", "Cost / Query", "Cost Saving", "Saved / Query"]
 st.dataframe(table_view, hide_index=True, width='stretch')
 
+st.subheader("Cost Comparison")
+bar_colors = [ACCENT_GREEN if s == best_row["strategy"] else TEXT_MUTED for s in result_df["strategy"]]
+fig = go.Figure(
+    go.Bar(
+        x=result_df["cost"], y=result_df["strategy"],
+        orientation="h", marker_color=bar_colors,
+        customdata=[core.format_money(c, display_currency) for c in result_df["cost"]],
+        hovertemplate="%{y}: %{customdata}<extra></extra>"
+    )
+)
+ 
+fig.update_layout(
+    xaxis_title=f"Cost per query ({display_currency})",
+    showlegend=False, height=300,
+    margin=dict(l=150, r=10, t=10, b=10),
+    font=CHART_FONT,
+    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+    xaxis=dict(color=TEXT_PRIMARY, gridcolor=BORDER),
+    yaxis=dict(
+        color=TEXT_PRIMARY, gridcolor=BORDER,
+        automargin=True
+    ),
+)
+fig.update_yaxes(autorange="reversed")
+st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
 
+with st.expander("**ABOUT THIS TOOL**"):
+    st.subheader("What is this?")
+    st.markdown(
+        """
+        This tool answers: **"Is partitioning and clustering really worth it?"**
+
+        It simulates BigQuery query costs using a BigQuery ML **XGBoost**. 
+        
+        Model trained on **12 months** real dataset of NYC Taxi with **24,000+** real dry-run benchmarks.
+ 
+        **Query pattern:**
+        ```sql
+        SELECT COUNT(*) AS n
+        FROM {table}
+        WHERE {date_partition} AND {cluster_column} IN ({zone_list})
+        ```
+
+        **Download result** from benchmark run [here](https://raw.githubusercontent.com/MNAtthoriq/de-projects-beyond-zoomcamp/refs/heads/main/03-data-warehouse/results/benchmark_results.csv)
+        """
+    )
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        st.subheader("Why the model thinks this?")
+        imp_df = pd.DataFrame(sorted(core.FEATURE_IMPORTANCE.items(), key=lambda x: x[1]), columns=["feature", "importance"])
+        fig2 = go.Figure(go.Bar(x=imp_df["importance"], y=imp_df["feature"], orientation="h", marker_color=ACCENT_INDIGO))
+        fig2.update_layout(
+            height=260, xaxis_title="Feature Importance", margin=dict(l=130, r=0, t=0, b=0),
+            font=CHART_FONT,
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(color=TEXT_PRIMARY, gridcolor=BORDER),
+            yaxis=dict(color=TEXT_PRIMARY, gridcolor=BORDER),
+        )
+        st.plotly_chart(fig2, width="stretch")
+    with col2:
+        sc1, sc2 = st.columns([1, 1])
+        with sc1:
+            st.metric("Test R\u00b2", f"{core.MODEL_METRICS["r2_test"]:.4f}")
+            st.metric("Test MAE", f"{core.MODEL_METRICS["mae_test_mb"]:.2f} MB")
+        with sc2:
+            st.metric("Train R\u00b2", f"{core.MODEL_METRICS["r2_train"]:.4f}")
+            st.metric("Train MAE", f"{core.MODEL_METRICS["mae_train_mb"]:.2f} MB")
+        fit = core.MODEL_METRICS["fit"]
+        if fit == "good fit":
+            st.success("✅ **Good fit**: generalizes well to unseen table sizes and date/zone combinations")
+        elif fit == "overfit":
+            st.warning("⚠️ **Overfit**: treat predictions with some caution")
+        else:
+            st.warning("⚠️ **Underfit**: model may be too simple for this relationship")
+    
+    st.markdown(
+            """
+            Feature importance reveals that bytes scanned are driven mainly by **storage design strategy** and **query selectivity**. 
+            
+            Partitioning, table size, and clustering consistently dominate the model's decisions, 
+            showing that **thoughtful table design** can **significantly reduce** BigQuery costs.
+
+            This answer that "partitioning and clustering are **really worth it**"
+            """
+        )
 
 
 
