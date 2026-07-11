@@ -76,55 +76,28 @@ with st.sidebar:
         st.caption("How big is your table?")
         table_size_gb = st.slider(
             "Table size",
-            0.5, 30.0, 5.0, 0.5,
+            1.0, 7.0, 5.0, 0.5,
             "%.1f GB",
             label_visibility="collapsed"
         )
-        if table_size_gb > core.TRAIN_SIZE_GB_MAX * 1.5:
-            st.caption(
-                f"⚠️ Training data only covered "
-                f"{core.TRAIN_SIZE_GB_MIN:.1f} - {core.TRAIN_SIZE_GB_MAX:.1f} GB tables. "
-                "Treat this as a rough extrapolation, not a precise estimate."
-            )
-        
-        # total days
-        st.caption("How many days your table cover?")
-        total_days = st.number_input(
-            "Total days",
-            1, None, 100,
-            label_visibility="collapsed",
-        )
-        if total_days > core.TRAIN_SIZE_DAYS_MAX * 1.5 and total_days <= 4000:
-            st.caption(
-                f"⚠️ Training data only covered "
-                f"{core.TRAIN_SIZE_DAYS_MIN} - {core.TRAIN_SIZE_DAYS_MAX} total days. "
-                "Treat this as a rough extrapolation, not a precise estimate."
-            )
-        if total_days > 4000:
-            st.caption(" :red[⚠️ Maximum days reached! \nYou cannot exceed 4000 days.]")
-            total_days = None
 
         # filter days
-        st.caption("How many days your table filter?")
-        filter_days = st.number_input(
+        st.caption("How many partition days your table filter?")
+        filter_days = st.slider(
             "Filter days",
-            1, None, min(7, int(total_days)),
+            0.0, 100.0, 10.0, 5.0,
+            "%.0f%%",
             label_visibility="collapsed"
         )
-        if filter_days > int(total_days):
-            st.caption(f" :red[⚠️ Maximum days reached! \nYou cannot exceed {int(total_days)} total days.]")
-            filter_days = None
         
         # filter zone
-        st.caption("How many pickup zones your table filter?")
-        filter_zones = st.number_input(
-            "Filter zone",
-            1, None, 10,
+        st.caption("How many cluster zones your table filter?")
+        filter_zones = st.slider(
+            "Filter zones",
+            0.0, 100.0, 10.0, 5.0,
+            "%.0f%%",
             label_visibility="collapsed"
         )
-        if filter_zones > core.TOTAL_ZONES:
-            st.caption(f" :red[⚠️ Maximum zone reached! \nYou cannot exceed {core.TOTAL_ZONES} zone.]")
-            filter_zones = None
 
 		# queries per day
         st.caption("How many queries per day?")
@@ -169,8 +142,8 @@ with st.sidebar:
 
 # compute
 table_size_bytes = table_size_gb * core.BYTES_PER_GB
-partition_ratio = filter_days / total_days
-cluster_ratio = filter_zones / core.TOTAL_ZONES
+partition_ratio = filter_days / 100
+cluster_ratio = filter_zones / 100
  
 raw_df = core.predict_bytes(booster, table_size_bytes, partition_ratio, cluster_ratio)
 result_df = core.add_cost_and_saving(raw_df, price_per_tib_display)
@@ -191,11 +164,7 @@ table_view["cost"] = table_view["cost"].apply(lambda c: core.format_money(c, dis
 table_view["saving_pct"] = table_view["saving_pct"].apply(lambda p: f"{p:.1f}%")
 table_view["saving_abs"] = table_view["saving_abs"].apply(lambda a: core.format_money(a, display_currency))
 table_view.columns = ["Strategy", "Data Scanned", "Cost / Query", "Saving vs Baseline", "Saved / Query"]
-st.dataframe(table_view, hide_index=True, use_container_width=True)
-
-st.write(table_size_bytes)
-st.write(partition_ratio)
-st.write(cluster_ratio)
+st.dataframe(table_view, hide_index=True, width='stretch')
 
 
 

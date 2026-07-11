@@ -46,44 +46,44 @@ def main():
             fqn = table_fqn(tier, variant)
             table_size_bytes = client.get_table(fqn).num_bytes
             for q in queries:
-                plan.append((tier, variant, q, fqn, zone_counts, total_rows, table_size_bytes))
+                plan.append((tier, variant, q, fqn, table_size_bytes))
     
     print(f"Total (tier, variant, query) combinations: {len(plan)}")
 
-    # results = []
-    # failed = 0
-    # for tier, variant, q, fqn, table_size_bytes in tqdm(plan, desc="dry-run queries"):
-    #     sql = q["sql_template"].format(table=fqn)
-    #     try:
-    #         bytes_processed = dry_run_bytes(sql)
-    #     except Exception as e:
-    #         failed += 1
-    #         tqdm.write(f"  dry_run failed (tier={tier}mo, variant={variant}, query_id={q['query_id']}): {e}")
-    #         continue
+    results = []
+    failed = 0
+    for tier, variant, q, fqn, table_size_bytes in tqdm(plan, desc="dry-run queries"):
+        sql = q["sql_template"].format(table=fqn)
+        try:
+            bytes_processed = dry_run_bytes(sql)
+        except Exception as e:
+            failed += 1
+            tqdm.write(f"  dry_run failed (tier={tier}mo, variant={variant}, query_id={q['query_id']}): {e}")
+            continue
         
-    #     results.append(
-    #         {
-    #             "tier_months": tier,
-    #             "variant": variant,
-    #             "query_id": q["query_id"],
-    #             "has_partition": variant in ("part", "partclust"),
-    #             "has_cluster": variant in ("clust", "partclust"),
-    #             "table_size_bytes": table_size_bytes,
-    #             "partition_filter_ratio": q["partition_filter_ratio"],
-    #             "cluster_filter_ratio": q["cluster_filter_ratio"],
-    #             "bytes_processed": bytes_processed
-    #         }
-    #     )
+        results.append(
+            {
+                "tier_months": tier,
+                "variant": variant,
+                "query_id": q["query_id"],
+                "has_partition": variant in ("part", "partclust"),
+                "has_cluster": variant in ("clust", "partclust"),
+                "table_size_bytes": table_size_bytes,
+                "partition_filter_ratio": q["partition_filter_ratio"],
+                "cluster_filter_ratio": q["cluster_filter_ratio"],
+                "bytes_processed": bytes_processed
+            }
+        )
     
-    # results_dir = (Path(__file__).resolve().parent / ".." / "results").resolve()
-    # results_dir.mkdir(parents=True, exist_ok=True)
-    # out_path = results_dir / "benchmark_results.csv"
-    # with out_path.open("w", newline="") as f:
-    #     writer = csv.DictWriter(f, fieldnames=list(results[0].keys()))
-    #     writer.writeheader()
-    #     writer.writerows(results)
+    results_dir = (Path(__file__).resolve().parent / ".." / "results").resolve()
+    results_dir.mkdir(parents=True, exist_ok=True)
+    out_path = results_dir / "benchmark_results.csv"
+    with out_path.open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=list(results[0].keys()))
+        writer.writeheader()
+        writer.writerows(results)
  
-    # print(f"\nWrote {len(results)} rows to {out_path}")
+    print(f"\nWrote {len(results)} rows to {out_path}")
 
 if __name__ == "__main__":
     main()

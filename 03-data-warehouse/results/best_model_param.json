@@ -1,12 +1,12 @@
 {
   "winner_model": "XGBRegressor",
   "metrics": {
-    "r2_train": 0.99988,
+    "r2_train": 0.99983,
     "r2_test": 0.99977,
-    "r2_gap_pct": 0.01105,
-    "mae_train_mb": 1.46074,
-    "mae_test_mb": 1.96837,
-    "mae_gap_pct": 34.75117,
+    "r2_gap_pct": 0.00635,
+    "mae_train_mb": 1.61246,
+    "mae_test_mb": 1.83899,
+    "mae_gap_pct": 14.04911,
     "fit": "good fit"
   },
   "hyperparameters": {

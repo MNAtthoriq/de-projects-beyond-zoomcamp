@@ -29,12 +29,9 @@ MODEL_METRICS = {
 MODEL_R2 = MODEL_METRICS["r2_test"]
 MODEL_MAE_MB = MODEL_METRICS["mae_test_mb"]
 
-TRAIN_SIZE_GB_MIN, TRAIN_SIZE_GB_MAX = 1.2, 7.3 # outside this range are extrapolation
-TRAIN_SIZE_DAYS_MIN, TRAIN_SIZE_DAYS_MAX = 60, 365 # outside this range are extrapolation
 DEFAULT_PRICE_PER_TIB_USD = 6.25  # BigQuery on-demand pricing, as of this build
 BYTES_PER_TIB = 2**40
 BYTES_PER_GB = 2**30
-TOTAL_ZONES = 261 # there are official 261 taxi zones
 
 STRATEGIES = [ # partition, cluster
     ("No optimization", 0, 0),
@@ -60,7 +57,7 @@ def build_row(booster, values: dict) -> pd.DataFrame:
     return pd.DataFrame([[values[c] for c in cols]], columns=cols)
 
 def predict_bytes(booster, table_size_bytes: float, partition_ratio: float, cluster_ratio: float) -> pd.DataFrame:
-    rows = []
+    raw = {}
     for name, has_part, has_clust in STRATEGIES:
         values = {
             "has_partition": has_part,
@@ -71,10 +68,26 @@ def predict_bytes(booster, table_size_bytes: float, partition_ratio: float, clus
         }
         row = build_row(booster, values)
         pred = float(booster.predict(xgb.DMatrix(row))[0])
-        pred = min(max(pred, 0.0), table_size_bytes) # bounds for table_size
+        pred = min(max(pred, 0.0), table_size_bytes)
+        raw[(has_part, has_clust)] = pred
+    
+    none_pred = max(raw[(0, 0)], raw[(1, 0)], raw[(0, 1)], raw[(1, 1)])
+    part_pred = min(raw[(1, 0)], none_pred)
+    clust_pred = min(raw[(0, 1)], none_pred)
+    partclust_pred = min(raw[(1, 1)], part_pred, clust_pred)
+
+    adjusted = {
+        (0, 0): none_pred,
+        (1, 0): part_pred,
+        (0, 1): clust_pred,
+        (1, 1): partclust_pred,
+    }
+
+    rows = []
+    for name, has_part, has_clust in STRATEGIES:
         rows.append({
-            "strategy": name, "has_partition": has_part, 
-            "has_cluster": has_clust, "predicted_bytes": pred
+            "strategy": name, "has_partition": has_part,
+            "has_cluster": has_clust, "predicted_bytes": adjusted[(has_part, has_clust)]
         })
     return pd.DataFrame(rows)
 
