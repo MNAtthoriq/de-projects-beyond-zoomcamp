@@ -1,3 +1,6 @@
+"""
+Backend core for streamlit app of this project
+"""
 from __future__ import annotations
  
 from pathlib import Path
@@ -40,6 +43,7 @@ STRATEGIES = [ # partition, cluster
 
 # function
 def load_booster(path: Path) -> xgb.Booster | None:
+    """Load booster model from file"""    
     if not path.exists():
         return None
     booster = xgb.Booster()
@@ -47,6 +51,7 @@ def load_booster(path: Path) -> xgb.Booster | None:
     return booster
 
 def build_row(booster, values: dict) -> pd.DataFrame:
+    """Build row for prediction"""
     booster_features = booster.feature_names
     if booster_features and set(booster_features) == set(values.keys()):
         cols = list(booster_features)
@@ -55,6 +60,7 @@ def build_row(booster, values: dict) -> pd.DataFrame:
     return pd.DataFrame([[values[c] for c in cols]], columns=cols)
 
 def predict_bytes(booster, table_size_bytes: float, partition_ratio: float, cluster_ratio: float) -> pd.DataFrame:
+    """Predict bytes scanned for each strategy"""
     raw = {}
     for name, has_part, has_clust in STRATEGIES:
         values = {
@@ -69,6 +75,7 @@ def predict_bytes(booster, table_size_bytes: float, partition_ratio: float, clus
         pred = min(max(pred, 0.0), table_size_bytes)
         raw[(has_part, has_clust)] = pred
     
+    # adjust predictions for monotonic_trends, see ml_model_selection.ipynb in intermezzo for details
     none_pred = max(raw[(0, 0)], raw[(1, 0)], raw[(0, 1)], raw[(1, 1)])
     part_pred = min(raw[(1, 0)], none_pred)
     clust_pred = min(raw[(0, 1)], none_pred)
@@ -90,6 +97,7 @@ def predict_bytes(booster, table_size_bytes: float, partition_ratio: float, clus
     return pd.DataFrame(rows)
 
 def add_cost_and_saving(df: pd.DataFrame, price_per_tib: float) -> pd.DataFrame:
+    """Add cost and saving columns to dataframe"""
     df = df.copy()
     df['cost'] = df['predicted_bytes'] / BYTES_PER_TIB * price_per_tib
     baseline_cost = df.loc[df.strategy == "No optimization", "cost"].iloc[0]
@@ -98,6 +106,7 @@ def add_cost_and_saving(df: pd.DataFrame, price_per_tib: float) -> pd.DataFrame:
     return df.sort_values('saving_abs').reset_index(drop=True)
 
 def fetch_usd_idr_rate() -> float | None:
+    """Fetch USD/IDR rate from Frankfurter API"""
     try:
         resp = requests.get("https://api.frankfurter.app/latest?from=USD&to=IDR", timeout=5)
         resp.raise_for_status()
@@ -108,6 +117,7 @@ def fetch_usd_idr_rate() -> float | None:
 def resolve_display_price(
         price_input: float, input_ccy: str, display_ccy: str, usd_idr_rate: float | None
 ) -> tuple[float, bool]:
+    """Resolve price based on input currency and display currency"""
     if input_ccy == display_ccy:
         return price_input, True
     if usd_idr_rate is None:
@@ -119,11 +129,13 @@ def resolve_display_price(
     return price_input, True
 
 def format_money(amount: float, currency: str, round: int = 4) -> str:
+    """Format amount as currency string"""
     if currency == "IDR":
         return f"Rp{amount:,.0f}"
     return f"${amount:,.{round}f}"
 
 def format_bytes(n: float) -> str:
+    """Format bytes as human-readable string"""
     if n >= 1e9:
         return f"{n / 1e9:,.2f} GB"
     return f"{n / 1e6:,.1f} MB"

@@ -1,3 +1,6 @@
+"""
+Frontend for streamlit app of this project
+"""
 from pathlib import Path
  
 import pandas as pd
@@ -50,6 +53,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# header
 st.title("Is Partitioning and Clustering Really Worth It?")
 st.caption(
     "See how partitioning and clustering affect your BigQuery query cost. "
@@ -69,6 +73,7 @@ if booster is None:
     if booster is None:
         st.stop()
 
+# sidebar input and credit
 with st.sidebar:
     with st.expander("**DESCRIBE YOUR QUERY**", expanded=True):
 
@@ -140,6 +145,7 @@ with st.sidebar:
             st.caption("⚠️ Live USD/IDR rate unavailable right now. Showing results in your input currency instead.")
             display_currency = input_currency
 
+    # credit
     st.markdown(
         f"""
         <div style="text-align:center; font-size:1em; color:{TEXT_MUTED}; line-height:1.6;">
@@ -156,11 +162,13 @@ with st.sidebar:
 table_size_bytes = table_size_gb * core.BYTES_PER_GB
 partition_ratio = filter_days / 100
 cluster_ratio = filter_zones / 100
- 
+
+# predict
 raw_df = core.predict_bytes(booster, table_size_bytes, partition_ratio, cluster_ratio)
 result_df = core.add_cost_and_saving(raw_df, price_per_tib_display)
 best_row = result_df.iloc[-1]
- 
+
+# callout best strategy
 if best_row["strategy"] != "No optimization" and best_row["saving_pct"] > 1:
     st.success(
         f"**\"{best_row['strategy']}\"** is the best strategy that cuts data scanned by **{best_row['saving_pct']:.2f}%**, "
@@ -169,12 +177,14 @@ if best_row["strategy"] != "No optimization" and best_row["saving_pct"] > 1:
 else:
     st.info("For this parameter combination, optimization barely moves the needle. The baseline is already close to optimal.")
 
+# scoreboard saving cost
 per_query = best_row["saving_abs"]
 c1, c2, c3 = st.columns(3)
 c1.metric("Saving per day", core.format_money(per_query * queries_per_day, display_currency, 0))
 c2.metric("Saving per month", core.format_money(per_query * queries_per_day * 30, display_currency, 0))
 c3.metric("Saving per year", core.format_money(per_query * queries_per_day * 365, display_currency, 0))
 
+# table
 st.subheader("Strategy Breakdown")
 table_view = result_df[["strategy", "predicted_bytes", "cost", "saving_pct", "saving_abs"]].copy()
 table_view["predicted_bytes"] = table_view["predicted_bytes"].apply(core.format_bytes)
@@ -184,6 +194,7 @@ table_view["saving_abs"] = table_view["saving_abs"].apply(lambda a: core.format_
 table_view.columns = ["Strategy", "Data Scanned", "Cost / Query", "Cost Saving", "Saved / Query"]
 st.dataframe(table_view, hide_index=True, width='stretch')
 
+# barh
 st.subheader("Cost Comparison")
 bar_colors = [ACCENT_GREEN if s == best_row["strategy"] else TEXT_MUTED for s in result_df["strategy"]]
 fig = go.Figure(
@@ -194,7 +205,6 @@ fig = go.Figure(
         hovertemplate="%{y}: %{customdata}<extra></extra>"
     )
 )
- 
 fig.update_layout(
     xaxis_title=f"Cost per query ({display_currency})",
     showlegend=False, height=300,
@@ -210,6 +220,7 @@ fig.update_layout(
 fig.update_yaxes(autorange="reversed")
 st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
 
+# explanation
 with st.expander("**ABOUT THIS TOOL**"):
     st.subheader("What is this?")
     st.markdown(
