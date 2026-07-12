@@ -17,7 +17,7 @@
 
 This project answers a concrete cost-engineering question: 
 ```
-For a NYC taxi trips table of a given size, how much does partitioning and/or clustering actually cut BigQuery cost? Is it WORTH it?
+For a NYC taxi trips table of a given size, how much does partitioning and/or clustering actually cut BigQuery cost?
 ```
 By generated 24,048 BigQuery dry-run queries on 48 benchmark tables built from 12 months of NYC Taxi Trips real data. This benchmark result trained on BigQuery ML to predict query cost based on user input of storage strategy, table size, and partition/cluster selectivity.
 
