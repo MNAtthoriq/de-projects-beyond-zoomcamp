@@ -87,7 +87,7 @@ with st.sidebar:
         )
 
         # filter days
-        st.caption("How many partition days your table filter?")
+        st.caption("How much data do your partition days cover?")
         filter_days = st.slider(
             "Filter days",
             1.0, 100.0, 10.0, 3.0,
@@ -96,7 +96,7 @@ with st.sidebar:
         )
         
         # filter zone
-        st.caption("How many cluster zones your table filter?")
+        st.caption("How much data do your cluster zones cover?")
         filter_zones = st.slider(
             "Filter zones",
             1.0, 100.0, 10.0, 3.0,
