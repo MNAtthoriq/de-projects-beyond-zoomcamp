@@ -80,6 +80,7 @@ What I improve from the [original tutorial](https://github.com/DataTalksClub/dat
 ## Usage
 
 ### Prerequisites
+- Run Setup from root project [(DE Projects - Beyond Zoomcamp)](../README.md)
 - Docker
 - Terraform >= 1.5
 - A GCP project with billing enabled, and credentials available (`gcloud auth application-default login`)
