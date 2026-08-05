@@ -1,94 +1,74 @@
-# BEYOND ZOOMCAMP: Data Engineering Projects Collection 
+# **Beyond Zoomcamp**: Data Engineering Portfolio
+
 ![Status](https://img.shields.io/badge/Status-In_Progress-yellow)
-<!--
-![Status](https://img.shields.io/badge/Status-Completed-green)
--->
 
-![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
-![Terraform](https://img.shields.io/badge/Terraform-844FBA?logo=terraform&logoColor=white)
-![Kestra](https://img.shields.io/badge/Kestra-5A3FF2?style=flat&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIGlkPSJMYXllcl8xIiB4PSIwIiB5PSIwIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48c3R5bGU%2BLnN0MHtmaWxsOiNhOTUwZmZ9LnN0MntmaWxsOiNjZDg4ZmZ9PC9zdHlsZT48cGF0aCBkPSJNMjM3LjkgMTk3LjJjMTAtMTAgMjYuMi0xMCAzNi4yIDBsNDEuMSA0MS4xYzEwIDEwIDEwIDI2LjIgMCAzNi4ybC00MS4xIDQxLjFjLTEwIDEwLTI2LjIgMTAtMzYuMiAwbC00MS4xLTQxLjFjLTEwLTEwLTEwLTI2LjIgMC0zNi4yem0xODkuNC0uM2M5LjgtOS44IDI1LjgtOS44IDM1LjYgMGw0MS44IDQxLjhjOS44IDkuOCA5LjggMjUuOCAwIDM1LjZMNDYyLjkgMzE2Yy05LjggOS44LTI1LjggOS44LTM1LjYgMGwtNDEuOC00MS44Yy05LjgtOS44LTkuOC0yNS44IDAtMzUuNnM0MS44LTQxLjcgNDEuOC00MS43IiBjbGFzcz0ic3QwIi8%2BPHBhdGggZD0iTTIzOC4yIDcuOEMyNDgtMiAyNjQtMiAyNzMuOCA3LjhsNDEuOCA0MS44YzkuOCA5LjggOS44IDI1LjggMCAzNS42TDI3My44IDEyN2MtOS44IDkuOC0yNS44IDkuOC0zNS42IDBsLTQxLjgtNDEuOGMtOS44LTkuOC05LjgtMjUuOCAwLTM1LjZ6IiBzdHlsZT0iZmlsbDojZTljMWZmIi8%2BPHBhdGggZD0iTTIyMC43IDE0My44YzEwIDEwIDEwIDI2LjIgMCAzNi4ybC00MS4xIDQxLjFjLTEwIDEwLTI2LjIgMTAtMzYuMiAwTDEwMi4yIDE4MGMtMTAtMTAtMTAtMjYuMiAwLTM2LjJsNDEuMS00MS4xYzEwLTEwIDI2LjItMTAgMzYuMiAweiIgY2xhc3M9InN0MiIvPjxwYXRoIGQ9Ik0xMjYuNSAyMzguNmM5LjggOS44IDkuOCAyNS44IDAgMzUuNkw4NC43IDMxNmMtOS44IDkuOC0yNS44IDkuOC0zNS42IDBMNy40IDI3NC4yYy05LjgtOS44LTkuOC0yNS44IDAtMzUuNmw0MS44LTQxLjhjOS44LTkuOCAyNS44LTkuOCAzNS42IDB6IiBjbGFzcz0ic3QwIi8%2BPHBhdGggZD0iTTQwOS44IDE0My44YzEwIDEwIDEwIDI2LjIgMCAzNi4ybC00MS4xIDQxLjFjLTEwIDEwLTI2LjIgMTAtMzYuMiAwTDI5MS4zIDE4MGMtMTAtMTAtMTAtMjYuMiAwLTM2LjJsNDEuMS00MS4xYzEwLTEwIDI2LjItMTAgMzYuMiAweiIgY2xhc3M9InN0MiIvPjxwYXRoIGQ9Ik0yOTYuNSA0MTMuOWMyMi4zIDIyLjMgMjIuMyA1OC42IDAgODAuOS0yMi40IDIyLjMtNTguNiAyMi4zLTgwLjkgMC0yMi40LTIyLjQtMjIuNC01OC42IDAtODAuOSAyMi4zLTIyLjQgNTguNS0yMi40IDgwLjkgMCIgc3R5bGU9ImZpbGw6I2Y2MmU3NiIvPjwvc3ZnPg%3D%3D&logoWidth=20)
-![Google Cloud](https://img.shields.io/badge/Google_Cloud-4285F4?logo=googlecloud&logoColor=white)
-![Google BigQuery](https://img.shields.io/badge/Google_BigQuery-669DF6?logo=googlebigquery&logoColor=white)
-![Google Data Studio](https://img.shields.io/badge/Google_Data_Studio-4285F4?logo=looker&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)
-<!--
-![DuckDB](https://img.shields.io/badge/DuckDB-FFF000?logo=duckdb&logoColor=black)
-![Apache Spark](https://img.shields.io/badge/Apache_Spark-E25A1C?logo=apachespark&logoColor=white)
-![Apache Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?logo=apachekafka&logoColor=white)
--->
+This portfolio demonstrates how I build reliable data pipelines,
+reproducible infrastructure, cloud data platforms, and decision-support
+applications using real-world datasets.
 
-This repository is a growing collection of Data Engineering projects. It is `not` a compilation of lecture notes. 
+## Featured Projects
 
-I am using [Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp) curriculum as a foundation. For each module, instead of blindly copy-pasting completed code, I close the tutorial and rebuild the project. My goals is not to reproduce same lecture code, but to compose a better version of my own.
+### **1. BigQuery Cost Optimization Simulator**
 
-I push it beyond tutorial. Beyond Zoomcamp.
+**Problem:** Data teams cannot easily estimate whether partitioning and clustering will materially reduce query costs for their workload.
 
-```
-LEARN  → Learn the concepts
-CLOSE  → Close the tutorial
-BUILD  → Build better projects
-```
+**Solution:** Benchmarked multiple table configurations and built a predictive application that estimates bytes processed and query cost.
 
-## Progress
+**Evidence:**
+- 24,048 benchmark queries
+- 48 BigQuery table configurations
+- XGBoost Model with 99.98% R² and 1.6 MB MAE on test data
+- Interactive Streamlit application
 
-| Module | Project | Status | Stack |
-|---|---|:---:|:---:|
-| 1.A - Containerization | [Taxi Data Ingestion Pipeline](01-docker-terraform/docker/) | 🟢 | <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white"> <img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white"><br><img src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white"> |
-| 1.B - Infrastructure as Code | [Containerized Data Platform Infrastructure](01-docker-terraform/terraform/) | 🟢 | <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white"> <img src="https://img.shields.io/badge/Terraform-844FBA?logo=terraform&logoColor=white"><br><img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white"> |
-| 2 - Workflow Orchestration | [Orchestrated Taxi Data Pipeline](02-workflow-orchestration) | 🟢 | <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white"> <img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white"> <img src="https://img.shields.io/badge/Terraform-844FBA?logo=terraform&logoColor=white"><br><img src="https://img.shields.io/badge/Kestra-5A3FF2?style=flat&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIGlkPSJMYXllcl8xIiB4PSIwIiB5PSIwIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48c3R5bGU+LnN0MHtmaWxsOiNhOTUwZmZ9LnN0MntmaWxsOiNjZDg4ZmZ9PC9zdHlsZT48cGF0aCBkPSJNMjM3LjkgMTk3LjJjMTAtMTAgMjYuMi0xMCAzNi4yIDBsNDEuMSA0MS4xYzEwIDEwIDEwIDI2LjIgMCAzNi4ybC00MS4xIDQxLjFjLTEwIDEwLTI2LjIgMTAtMzYuMiAwbC00MS4xLTQxLjFjLTEwLTEwLTEwLTI2LjIgMC0zNi4yem0xODkuNC0uM2M5LjgtOS44IDI1LjgtOS44IDM1LjYgMGw0MS44IDQxLjhjOS44IDkuOCA5LjggMjUuOCAwIDM1LjZMNDYyLjkgMzE2Yy05LjggOS44LTI1LjggOS44LTM1LjYgMGwtNDEuOC00MS44Yy05LjgtOS44LTkuOC0yNS44IDAtMzUuNnM0MS44LTQxLjcgNDEuOC00MS43IiBjbGFzcz0ic3QwIi8+PHBhdGggZD0iTTIzOC4yIDcuOEMyNDgtMiAyNjQtMiAyNzMuOCA3LjhsNDEuOCA0MS44YzkuOCA5LjggOS44IDI1LjggMCAzNS42TDI3My44IDEyN2MtOS44IDkuOC0yNS44IDkuOC0zNS42IDBsLTQxLjgtNDEuOGMtOS44LTkuOC05LjgtMjUuOCAwLTM1LjZ6IiBzdHlsZT0iZmlsbDojZTljMWZmIi8+PHBhdGggZD0iTTIyMC43IDE0My44YzEwIDEwIDEwIDI2LjIgMCAzNi4ybC00MS4xIDQxLjFjLTEwIDEwLTI2LjIgMTAtMzYuMiAwTDEwMi4yIDE4MGMtMTAtMTAtMTAtMjYuMiAwLTM2LjJsNDEuMS00MS4xYzEwLTEwIDI2LjItMTAgMzYuMiAweiIgY2xhc3M9InN0MiIvPjxwYXRoIGQ9Ik0xMjYuNSAyMzguNmM5LjggOS44IDkuOCAyNS44IDAgMzUuNkw4NC43IDMxNmMtOS44IDkuOC0yNS44IDkuOC0zNS42IDBMNy40IDI3NC4yYy05LjgtOS44LTkuOC0yNS44IDAtMzUuNmw0MS44LTQxLjhjOS44LTkuOCAyNS44LTkuOCAzNS42IDB6IiBjbGFzcz0ic3QwIi8+PHBhdGggZD0iTTQwOS44IDE0My44YzEwIDEwIDEwIDI2LjIgMCAzNi4ybC00MS4xIDQxLjFjLTEwIDEwLTI2LjIgMTAtMzYuMiAwTDI5MS4zIDE4MGMtMTAtMTAtMTAtMjYuMiAwLTM2LjJsNDEuMS00MS4xYzEwLTEwIDI2LjItMTAgMzYuMiAweiIgY2xhc3M9InN0MiIvPjxwYXRoIGQ9Ik0yOTYuNSA0MTMuOWMyMi4zIDIyLjMgMjIuMyA1OC42IDAgODAuOS0yMi40IDIyLjMtNTguNiAyMi4zLTgwLjkgMC0yMi40LTIyLjQtMjIuNC01OC42IDAtODAuOSAyMi4zLTIyLjQgNTguNS0yMi40IDgwLjkgMCIgc3R5bGU9ImZpbGw6I2Y2MmU3NiIvPjwvc3ZnPg==&logoWidth=20"> <img src="https://img.shields.io/badge/Google_Cloud-4285F4?logo=googlecloud&logoColor=white"><br><img src="https://img.shields.io/badge/Google_BigQuery-669DF6?logo=googlebigquery&logoColor=white"> <img src="https://img.shields.io/badge/Google_Data_Studio-4285F4?logo=looker&logoColor=white"> |
-| 3 - Data Warehousing | [How Much Money Do BigQuery Partitioning and Clustering Actually Save?](03-data-warehouse/) | 🟢 | <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white"> <img src="https://img.shields.io/badge/Terraform-844FBA?logo=terraform&logoColor=white"> <img src="https://img.shields.io/badge/Google_Cloud-4285F4?logo=googlecloud&logoColor=white"><br><img src="https://img.shields.io/badge/Google_BigQuery-669DF6?logo=googlebigquery&logoColor=white"> <img src="https://img.shields.io/badge/BigQuery_ML-4285F4?logo=googlebigquery&logoColor=white"> <img src="https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white"> |
-| 4 - Analytics Engineering | — | 🟡 | — |
-| 5 - Data Platforms | — | ⚪️ | — |
-| 6 - Batch Processing | — | ⚪️ | — |
-| 7 - Streaming | — | ⚪️ | — |
-| Data Ingestion Workshop | — | ⚪️ | — |
+[Live Application](https://bigquery-partition-cluster-savings.streamlit.app/) · [View Project](/03-data-warehouse/README.md)
 
-`Status = 🟢 Done | 🟡 Progress | ⚪️ Upcoming`
+### **2. Reliable NYC Taxi Data Platform**
 
-## Repository Structure
- 
-```
-learn-data-engineering-zoomcamp/
-├── 01-docker-terraform/        ← completed
-├── 02-workflow-orchestration/  ← completed
-├── 03-data-warehouse/          ← completed
-├── 04-analytics-engineering/   ← (in progress)
-├── 05-data-platforms/          ← coming soon
-├── 06-batch/                   ← coming soon
-├── 07-streaming/               ← coming soon
-├── workshop-data-ingestion/    ← coming soon
-├── pyproject.toml
-├── uv.lock
-├── .python-version
-├── .gitignore
-├── LICENSE
-└── README.md
-```
+**Problem:** Recurring public-data ingestion requires repetitive manual work and can fail silently, create duplicate records, or break when the source schema changes.
 
-## Setup
- 
-This repo uses [uv](https://github.com/astral-sh/uv) for Python environment management.
- 
-```bash
-# Clone the repo
-git clone https://github.com/MNAtthoriq/de-projects-beyond-zoomcamp.git
-cd de-projects-beyond-zoomcamp
- 
-# Install dependencies
-uv sync --locked
-```
+**Solution:** Built an automated monthly data pipeline with orchestration, idempotent loading, data-quality gates, retries, schema-evolution handling, centralized Gmail failure alerts, and an operational monitoring dashboard.
 
-> Each project's README has its own run instructions.
+**Evidence:**
+- Automated ingestion, validation, and monitoring of monthly taxi data
+- Ingested 11.31 million rows from 6 source files
+- Detected and categorized 72,392 data-quality anomaly flags
+- Interactive monitoring by filename, taxi type, and load date
+- Automated Gmail alerts for pipeline failures
+- Duplicate-safe reruns and schema-evolution handling
 
-## Author
+[Live Dashboard](https://datastudio.google.com/reporting/8bfe46b6-7e23-4628-9b3f-464be80dda8c) · [View Project](/02-workflow-orchestration/README.md)
 
-**Muhammad Naufal At-Thoriq**
-- GitHub: [MNAtthoriq](https://github.com/MNAtthoriq)
-- LinkedIn: [Muhammad Naufal At-Thoriq](https://linkedin.com/in/mnatthoriq)
+## Project Portfolio
 
-## References
+| Project | Problem Solved | Output | Zoomcamp Module |
+|---|---|---|---|
+| [BigQuery Cost Optimization Simulator](/03-data-warehouse/README.md) | Estimates the value of partitioning and clustering for different BigQuery workloads | [Live Simulator](https://bigquery-partition-cluster-savings.streamlit.app/) | Data Warehousing |
+| [Reliable NYC Taxi Data Platform](/02-workflow-orchestration/README.md) | Automates reliable recurring ingestion with quality controls and failure monitoring | [Live Dashboard](https://datastudio.google.com/reporting/8bfe46b6-7e23-4628-9b3f-464be80dda8c) | Workflow Orchestration |
+| [Containerized Local Data Platform](/01-docker-terraform) | Creates a reproducible local PostgreSQL environment instead of relying on manual setup | Code and technical demonstration | Containerization & Infrastructure |
 
-- Data Engineering Zoomcamp: https://github.com/DataTalksClub/data-engineering-zoomcamp
-- DataTalks.Club: https://datatalks.club/
+## Why “Beyond Zoomcamp”?
+
+I use the
+[Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp)
+curriculum by [DataTalks.Club](https://datatalks.club/) as a structured foundation for learning data engineering.
+
+For each module, instead of blindly copy-pasting completed code, I close the tutorial and rebuild the project. My goals is not to reproduce same lecture code, but to compose a better version of my own.
+
+> **LEARN**   → Learn the concepts
+>
+> **CLOSE**   → Close the tutorial  
+>
+> **BUILD**   → Build better projects
+
+## About Me
+
+I am an Operations Analyst with two years of experience using data,
+automation, and dashboards to improve operational workflows and decision-making.
+
+My professional work includes Python automation, reusable data-processing
+pipelines, operational reporting, data validation, and dashboard development.
+
+I am now expanding that experience into cloud data engineering, orchestration,
+data warehousing, and analytics engineering.
+
+[GitHub](https://github.com/MNAtthoriq) · [LinkedIn](https://linkedin.com/in/mnatthoriq)
