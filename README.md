@@ -62,6 +62,8 @@ For each module, instead of blindly copy-pasting completed code, I close the tut
 
 ## About Me
 
+**Muhammad Naufal At-Thoriq**
+
 I am an Operations Analyst with two years of experience using data,
 automation, and dashboards to improve operational workflows and decision-making.
 
