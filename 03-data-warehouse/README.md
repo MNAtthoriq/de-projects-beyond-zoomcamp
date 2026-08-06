@@ -99,7 +99,7 @@ The local notebook (`ml_model_selection.ipynb`) exists specifically because BQML
 </p>
 
 <p align="center">
-  <a href="https://datastudio.google.com/reporting/8bfe46b6-7e23-4628-9b3f-464be80dda8c">
+  <a href="https://bigquery-partition-cluster-savings.streamlit.app/">
     View the interactive Streamlit dashboard here
   </a>
 </p>
