@@ -9,11 +9,11 @@
 ![BigQuery ML](https://img.shields.io/badge/BigQuery_ML-4285F4?logo=googlebigquery&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)
 
-*This project is part of [Beyond Zoomcamp: Data Engineering Portfolio](https://github.com/MNAtthoriq/de-projects-beyond-zoomcamp/blob/main/README.md)*
-
 An interactive tool that uses real BigQuery benchmark results to compare partitioning and clustering strategies and estimate query-cost savings before execution.
 
 [Live Simulator](https://bigquery-partition-cluster-savings.streamlit.app/) · [Technical Documentation](TECHNICAL.md)
+
+*This project is part of [Beyond Zoomcamp: Data Engineering Portfolio](https://github.com/MNAtthoriq/de-projects-beyond-zoomcamp/blob/main/README.md)*
 
 ## Executive Summary
 
