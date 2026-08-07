@@ -1,4 +1,4 @@
-# How Much Money Do BigQuery Partitioning and Clustering Actually Save?
+# BigQuery Cost Optimization Simulator
 
 ![Status](https://img.shields.io/badge/Status-Completed-green)
 
