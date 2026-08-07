@@ -10,41 +10,41 @@ applications using real-world datasets.
 
 ### **1. BigQuery Cost Optimization Simulator**
 
+[Live Application](https://bigquery-partition-cluster-savings.streamlit.app/) · [View Project](/03-data-warehouse/README.md)
+
 **Problem:** Data teams cannot easily estimate whether partitioning and clustering will materially reduce query costs for their workload.
 
 **Solution:** Benchmarked multiple table configurations and built a predictive application that estimates bytes processed and query cost.
 
-**Evidence:**
-- 24,048 benchmark queries
-- 48 BigQuery table configurations
-- XGBoost Model with 99.98% R² and 1.6 MB MAE on test data
-- Interactive Streamlit application
-
-[Live Application](https://bigquery-partition-cluster-savings.streamlit.app/) · [View Project](/03-data-warehouse/README.md)
+| Metric | Result |
+|---|---:|
+| Benchmark Queries | 24,048 BigQuery dry-run queries |
+| Table Configurations | 48 benchmark tables |
+| Largest Data Tier | 48.51 million rows / 7.23 GB |
+| Model Test Performance | R² 0.9998 / MAE 1.60 MB |
 
 ### **2. Reliable NYC Taxi Data Platform**
 
-**Problem:** Recurring public-data ingestion requires repetitive manual work and can fail silently, create duplicate records, or break when the source schema changes.
-
-**Solution:** Built an automated monthly data pipeline with orchestration, idempotent loading, data-quality gates, retries, schema-evolution handling, centralized Gmail failure alerts, and an operational monitoring dashboard.
-
-**Evidence:**
-- Automated ingestion, validation, and monitoring of monthly taxi data
-- Ingested 11.31 million rows from 6 source files
-- Detected and categorized 72,392 data-quality anomaly flags
-- Interactive monitoring by filename, taxi type, and load date
-- Automated Gmail alerts for pipeline failures
-- Duplicate-safe reruns and schema-evolution handling
-
 [Live Dashboard](https://datastudio.google.com/reporting/8bfe46b6-7e23-4628-9b3f-464be80dda8c) · [View Project](/02-workflow-orchestration/README.md)
+
+**Problem:** Monthly taxi data needs to be downloaded, checked, and loaded repeatedly. This process can fail, create duplicate data, or break when the source changes.
+
+**Solution:** Built an automated pipeline that downloads new data, validates it, safely updates BigQuery, handles expected source changes, sends Gmail alerts when a run fails, and updates a monitoring dashboard.
+
+| Metric | Result |
+|---|---:|
+| Pipeline Execution | 3 months of data processed with 0 failed runs |
+| Rows Ingested | 11.31 million rows |
+| Data Anomaly Flags Detected | 72,392 anomalies |
+| Files Ingested | 6 files |
 
 ## Project Portfolio
 
-| Project | Problem Solved | Output | Zoomcamp Module |
+| Project | Output | Problem Solved | Zoomcamp Module |
 |---|---|---|---|
-| [BigQuery Cost Optimization Simulator](/03-data-warehouse/README.md) | Estimates the value of partitioning and clustering for different BigQuery workloads | [Live Simulator](https://bigquery-partition-cluster-savings.streamlit.app/) | Data Warehousing |
-| [Reliable NYC Taxi Data Platform](/02-workflow-orchestration/README.md) | Automates reliable recurring ingestion with quality controls and failure monitoring | [Live Dashboard](https://datastudio.google.com/reporting/8bfe46b6-7e23-4628-9b3f-464be80dda8c) | Workflow Orchestration |
-| [Containerized Local Data Platform](/01-docker-terraform) | Creates a reproducible local PostgreSQL environment instead of relying on manual setup | Code and technical demonstration | Containerization & Infrastructure |
+| [BigQuery Cost Optimization Simulator](/03-data-warehouse/README.md) | [Live Simulator](https://bigquery-partition-cluster-savings.streamlit.app/) | Estimates the value of partitioning and clustering for different BigQuery workloads | Data Warehousing |
+| [Reliable NYC Taxi Data Platform](/02-workflow-orchestration/README.md) | [Live Dashboard](https://datastudio.google.com/reporting/8bfe46b6-7e23-4628-9b3f-464be80dda8c) | Automates reliable recurring ingestion with quality controls and failure monitoring | Workflow Orchestration |
+| [Containerized Local Data Platform](/01-docker-terraform) | Code and technical demonstration | Creates a reproducible local PostgreSQL environment instead of relying on manual setup | Containerization & Infrastructure |
 
 ## Why “Beyond Zoomcamp”?
 
