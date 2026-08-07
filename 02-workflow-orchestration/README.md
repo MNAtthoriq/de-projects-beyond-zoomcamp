@@ -1,7 +1,6 @@
-# Orchestrated Taxi Data Pipeline
+# Reliable NYC Taxi Data Platform
 
 ![Status](https://img.shields.io/badge/Status-Completed-green)
-![Module](https://img.shields.io/badge/Module%202-Workflow%20Orchestration-blue)
 
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
@@ -12,152 +11,101 @@
 ![Google BigQuery](https://img.shields.io/badge/Google_BigQuery-669DF6?logo=googlebigquery&logoColor=white)
 ![Google Data Studio](https://img.shields.io/badge/Google_Data_Studio-4285F4?logo=looker&logoColor=white)
 
-## Overview
+*This project is part of [Beyond Zoomcamp: Data Engineering Portfolio](https://github.com/MNAtthoriq/de-projects-beyond-zoomcamp/blob/main/README.md)*
 
-A monthly ELT pipeline that pulls NYC TLC taxi trip and zone data into BigQuery, orchestrated end-to-end with [Kestra](https://kestra.io) and provisioned on GCP with Terraform. It deduplicates, quality-gates, schema-evolves, and alerts on failure, then feeds a Google Data Studio (formerly Looker Studio) proof for monitoring.
+An automated monthly data pipeline that collects NYC taxi data, checks its quality, loads it into BigQuery, alerts when something fails, and provides a dashboard to monitor the result.
 
-What I improve from the [original tutorial](https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/02-workflow-orchestration):
-| Original tutorial | My Version |
-| :--- | :--- |
-| Static, gzipped **CSV** backup from GitHub as source data | Live monthly **Parquet** release straight from NYC TLC's official CDN as source data |
-| No **retries**, no data **quality check**, no **alerting** | Task **retries**, a SQL **data-quality gate**, and centralized **Gmail alert** flow for the whole project |
-| No **schema evolution** handling | Using `ALTER TABLE ...` to absorbs TLC's **new `cbd_congestion_fee` column** (introduced in 2025) without breaking the pipeline |
-| Keeps external and staging tables after loading | Drops external and staging tables after use to reduce storage costs and keep the dataset clean |
-| **Mixed** infrastructure and orchestration responsibilities (everything using Kestra) | Clear separation of concerns: **Terraform for infrastructure**, **Kestra for orchestration** |
-| Flow **manually** copy-pasted into Kestra UI | Flows synced **automatically** using local sync |
-| **Manual** secret configuration | Scripts **automate** Base64 encoding and `.env` import into Kestra's Key-Value Store |
-| No **dimension data** or **monitoring proof** | Loads the NYC TLC **zone lookup table** and builds **monitoring views** for Google Data Studio **proof** |
+[Live Dashboard](https://datastudio.google.com/reporting/8bfe46b6-7e23-4628-9b3f-464be80dda8c) · [Technical Documentation](TECHNICAL.md)
 
-## Key Learnings
+## Executive Summary
 
-| Concept | What I Learned |
-| :---: | :--- |
-| Idempotent Loads | MD5 hash of business keys as `unique_row_id`, combined with `MERGE`, means rerunning or backfilling a month never creates duplicate rows |
-| Data Quality Gates | SQL `ERROR()` checks fail a run immediately on 0 rows or duplicate keys, instead of letting bad data flow downstream silently |
-| Schema Evolution | `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` lets the pipeline absorb new source columns without a manual migration |
-| Pebble Syntax | Pebble does not support nested expressions, so variables should be declared explicitly before use |
-| Kestra's Trigger | Trigger may not start if concurrency is limited. Re-create trigger solve this problem |
+<table>
+  <tr>
+    <td width="18%"><strong>Problem</strong></td>
+    <td>Monthly taxi data needs to be downloaded, checked, and loaded repeatedly. This process can fail, create duplicate data, or break when the source changes.</td>
+  </tr>
+  <tr>
+    <td width="18%"><strong>Why It Matters</strong></td>
+    <td>If those problems go unnoticed, analysts may work with incomplete, duplicated, or outdated data. Manual checking also adds repetitive work every month.</td>
+  </tr>
+  <tr>
+    <td width="18%"><strong>Solution</strong></td>
+    <td>Built an automated pipeline that downloads new data, validates it, safely updates BigQuery, handles expected source changes, sends Gmail alerts when a run fails, and updates a monitoring dashboard.</td>
+  </tr>
+</table>
 
-## Proof
+## Results
 
-<p align="center">
-  <img src="proof/proof.gif" width="500" alt="Dashboard demo — filtering and drill-down">
+### Measured Metrics
+
+| Metric | Result |
+|---|---:|
+| Pipeline Execution | 3 months of data processed with 0 failed runs |
+| Rows Ingested | 11.31 million rows |
+| Data Anomaly Flags Detected | 72,392 anomalies |
+| Files Ingested | 6 files |
+
+### Key Capabilities
+
+- **Automated data pipeline** — collects, checks, and loads new NYC taxi data into BigQuery with minimal manual work
+- **Safe data updates** — prevents duplicate records when the same data is processed again
+- **Built-in data quality checks** — stops problematic loads and flags unusual records for investigation
+- **Automatic failure handling** — retries temporary failures and sends Gmail alerts when a pipeline run has a problem
+- **Interactive monitoring dashboard** — shows data loads, processing volume, and detected data-quality issues in one place
+
+## Live Output
+
+<p align="left">
+  <img src="proof/proof.png" width="500" alt="Dashboard demo — filtering and drill-down">
 </p>
 
-<p align="center">
-  <a href="https://datastudio.google.com/reporting/8bfe46b6-7e23-4628-9b3f-464be80dda8c">
-    View the interactive Google Data Studio dashboard here
-  </a>
-</p>
+[Open Live Dashboard here](https://datastudio.google.com/reporting/8bfe46b6-7e23-4628-9b3f-464be80dda8c)
 
-## Structure
+The dashboard gives a quick view of whether the pipeline is working and what data was loaded.
 
-```
-02-workflow-orchestration/
-├── docker-compose.yml          ← Docker Compose configuration for Kestra
-├── .env.example
-├── .env.secrets.example
-├── flows/                      ← orchestration flow by Kestra
-│   ├── main_zoomcamp.00_environment_setup.yaml
-│   ├── main_zoomcamp.01_taxi_tripdata_pipeline.yaml
-│   ├── main_zoomcamp.02_taxi_zone_pipeline.yaml
-│   ├── main_zoomcamp.03_proof_views_pipeline.yaml
-│   └── main_zoomcamp.99_monitoring_alerts.yaml
-├── scripts/
-│   ├── bootstrap_env.sh        ← pushes terraform output into Kestra KV
-│   └── encode_secrets.sh       ← encodes .env.secrets into .env_encoded
-├── terraform/                  ← provisions GCS bucket, BigQuery dataset, service account
-│   ├── main.tf
-│   ├── outputs.tf
-│   ├── variables.tf
-│   └── terraform.tfvars.example
-├── proof/                      ← proof and gif as proof that project completed
-│   ├── proof_export.pdf
-│   └── proof.gif
-└── README.md
+Users can:
+
+- See how many files and rows have been ingested
+- Check the latest successful load
+- Compare Yellow and Green taxi data volume
+- See how many data-quality issues were flagged in each file
+- Investigate issue types such as negative amounts, negative trip duration, and zero-fare trips
+- Filter the dashboard by file, taxi type, and load date
+
+> The 72,392 anomaly flags are rule-based checks that highlight records worth investigating. A flagged record is not automatically an invalid record.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A[NYC Taxi Data] --> B{Pipeline Run Successful?}
+    B -->|Yes| C[BigQuery]
+    C --> D[Monitoring Dashboard]
+    B -->|No / Warning| E[Gmail Alert]
 ```
 
-## Usage
+In simple terms:
 
-### Prerequisites
-- Run Setup from root project [(DE Projects - Beyond Zoomcamp)](../README.md)
-- Docker
-- Terraform >= 1.5
-- A GCP project with billing enabled, and credentials available (`gcloud auth application-default login`)
-- `jq` and `curl` (used by `scripts/bootstrap_env.sh`)
-- *(Optional)* a Gmail account + [App Password](https://support.google.com/mail/answer/185833) for `flows/99_monitoring_alerts.yaml`
+1. New taxi data is collected automatically each month.
+2. The pipeline checks the data before adding it to the main dataset.
+3. Valid data is safely loaded into BigQuery.
+4. If the process fails, an email alert is sent automatically.
+5. The dashboard shows what was loaded and where potential data-quality issues exist.
 
-### 1. Provision infrastructure
-```bash
-cd terraform
-cp terraform.tfvars.example terraform.tfvars   # fill in project_id, bucket_name, etc.
-terraform init
-terraform apply
-```
+## Technical Documentation
 
-### 2. Configure environment
-```bash
-cd ..
-cp .env.example .env                      # fill for Kestra's Key-Value Store
-cp .env.secrets.example .env.secrets      # fill for Kestra's Secret
-```
+For detailed explanation about how the project is built, configured, and run:
 
-### 3. Encode secrets for Kestra
-```bash
-./scripts/encode_secrets.sh   # encoding .env.secrets into base64 as .env_encoded
-```
+[Read Technical Documentation here](TECHNICAL.md)
 
-### 4. Start Kestra
-```bash
-docker compose up -d
-```
-Kestra UI → `http://localhost:${KESTRA_UI_PORT:-18081}` (login from `.env`)
-
-### 5. Bootstrap the KV store
-```bash
-./scripts/bootstrap_env.sh   # pushes terraform output → Kestra KV, once per environment
-```
-
-### 6. Run the pipelines
-Trigger manually from the Kestra UI, or let the schedules run on the 5th of every month:
-- `02_taxi_zone_pipeline` → 08:00 UTC
-- `01_taxi_tripdata_pipeline` (green) → 09:00 UTC
-- `01_taxi_tripdata_pipeline` (yellow) → 10:00 UTC
-- `03_dashboard_views_pipeline` fires automatically once both succeed, time window 08:00 - 12:00 UTC
-
-### Teardown
-```bash
-docker compose down -v              # stop Kestra + Postgres, remove local volumes
-cd terraform && terraform destroy   # remove GCS bucket, BigQuery dataset, service account
-```
-
-## Environment Variables
-
-| Variable | File | Description | Sensitive |
-| :--- | :--- | :--- | :---: |
-| `KESTRA_POSTGRES_PASSWORD` | `.env` | Password for Kestra's internal Postgres metastore | Yes |
-| `KESTRA_BASIC_AUTH_USERNAME` | `.env` | Username to log into the Kestra UI | No |
-| `KESTRA_BASIC_AUTH_PASSWORD` | `.env` | Password to log into the Kestra UI | Yes |
-| `KESTRA_UI_PORT` | `.env` | Host port for Kestra UI (default `18081`) | No |
-| `GCP_CREDS_BASE64` | `.env.secrets` | Base64 service-account key, from `terraform output -raw kestra_service_account_key_base64` | Yes |
-| `GMAIL_ADDRESS` | `.env.secrets` | Sender/receiver address for failure alerts (optional) | No |
-| `GMAIL_APP_PASSWORD` | `.env.secrets` | Gmail App Password for SMTP auth (optional) | Yes |
-| `project_id` | `terraform.tfvars` | Google Cloud project ID where resources will be created | No |
-| `region` | `terraform.tfvars` | Google Cloud region for provisioning resources | No |
-| `bucket_name` | `terraform.tfvars` | Name of the GCS bucket used for raw data storage | No |
-| `dataset_id` | `terraform.tfvars` | BigQuery dataset name for the ELT pipeline | No |
-| `service_account_id` | `terraform.tfvars` | ID of the service account created for Kestra | No |
-| `raw_data_retention_days` | `terraform.tfvars` | Number of days to retain raw data in the GCS bucket before automatic deletion | No |
-
-## Author
+## About Me
 
 **Muhammad Naufal At-Thoriq**
-- GitHub: [MNAtthoriq](https://github.com/MNAtthoriq)
-- LinkedIn: [Muhammad Naufal At-Thoriq](https://linkedin.com/in/mnatthoriq)
 
-## Reference
+I am an Operations Analyst with two years of experience using data, automation, and dashboards to improve operational workflows and decision-making.
 
-- [DE Projects - Beyond Zoomcamp](../)
-- [Module 2 - Workflow Orchestration (original tutorial)](https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/02-workflow-orchestration)
-- [Kestra Documentation](https://kestra.io/docs)
-- [Terraform - Google Provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
+My professional work includes Python automation, reusable data-processing pipelines, operational reporting, data validation, and dashboard development.
+
+I am expanding that experience into cloud data engineering, workflow orchestration, data warehousing, and analytics engineering.
+
+[GitHub](https://github.com/MNAtthoriq) · [LinkedIn](https://linkedin.com/in/mnatthoriq)
