@@ -1,0 +1,75 @@
+name: Analytics Engineering CI
+
+on:
+  push:
+    paths:
+      - "04-analytics-engineering/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".python-version"
+      - ".github/workflows/analytics-engineering-ci.yml"
+
+  pull_request:
+    paths:
+      - "04-analytics-engineering/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".python-version"
+      - ".github/workflows/analytics-engineering-ci.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  environment:
+    name: Validate development environment
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          version: "0.12.3"
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install
+
+      - name: Install dependencies
+        run: uv sync --locked --group analytics-engineering
+
+      - name: Check dbt
+        run: uv run --group analytics-engineering dbt --version
+
+      - name: Lint
+        run: uv run --group analytics-engineering ruff check 04-analytics-engineering
+
+      - name: Test
+        run: uv run --group analytics-engineering pytest 04-analytics-engineering/tests
+
+      - name: Validate Docker Compose
+        run: docker compose -f 04-analytics-engineering/docker-compose.yml config --quiet
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v4.0.1
+        with:
+          terraform_version: "1.15.8"
+
+      - name: Initialize Terraform
+        run: >
+          terraform
+          -chdir=04-analytics-engineering/terraform
+          init
+          -backend=false
+          -lockfile=readonly
+
+      - name: Check Terraform formatting
+        run: terraform -chdir=04-analytics-engineering/terraform fmt -check
+
+      - name: Validate Terraform
+        run: terraform -chdir=04-analytics-engineering/terraform validate

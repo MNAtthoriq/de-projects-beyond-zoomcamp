@@ -1,0 +1,19 @@
+name: analytics-engineering
+
+services:
+  airflow:
+    image: apache/airflow:3.3.0-python3.12
+    command: standalone
+
+    ports:
+      - "8080:8080"
+    
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - airflow_state:/opt/airflow
+    
+volumes:
+  airflow_state:
