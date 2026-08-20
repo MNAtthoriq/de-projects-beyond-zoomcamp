@@ -44,13 +44,13 @@ jobs:
         run: uv sync --locked --group analytics-engineering
 
       - name: Check dbt
-        run: uv run --group analytics-engineering dbt --version
+        run: uv run dbt --version
 
       - name: Lint
-        run: uv run --group analytics-engineering ruff check 04-analytics-engineering
+        run: uv run ruff check 04-analytics-engineering
 
       - name: Test
-        run: uv run --group analytics-engineering pytest 04-analytics-engineering/tests
+        run: uv run pytest 04-analytics-engineering/tests
 
       - name: Validate Docker Compose
         run: docker compose -f 04-analytics-engineering/docker-compose.yml config --quiet
