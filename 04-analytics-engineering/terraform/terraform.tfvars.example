@@ -1,0 +1,4 @@
+# copy this into terraform.tfvars then change variable to your desired input
+
+project_id  = "your-gcp-project-id"
+region      = "asia-southeast1"
